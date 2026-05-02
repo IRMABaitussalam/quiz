@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>IRMA Baitussalam · Kuis & Ranking</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <style>
+    /* ===== CSS Variables & Neumorphism Theme ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #e8edf2;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    /* main card - neumorphic container */
+    .app-container {
+      width: 100%;
+      max-width: 1000px;
+      background: #e8edf2;
+      border-radius: 40px;
+      box-shadow: 20px 20px 40px #c0c7cf, -20px -20px 40px #ffffff;
+      padding: 30px;
+    }
+
+    /* ===== Neumorphic Elements ===== */
+    .neu-card {
+      background: #e8edf2;
+      border-radius: 24px;
+      box-shadow: 8px 8px 16px #c0c7cf, -8px -8px 16px #ffffff;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .neu-inset {
+      background: #e8edf2;
+      border-radius: 24px;
+      box-shadow: inset 6px 6px 12px #c0c7cf, inset -6px -6px 12px #ffffff;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    button.neu-btn {
+      background: #e8edf2;
+      border: none;
+      border-radius: 40px;
+      box-shadow: 6px 6px 12px #c0c7cf, -6px -6px 12px #ffffff;
+      padding: 12px 24px;
+      font-weight: 600;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.neu-btn:hover {
+      box-shadow: 9px 9px 18px #c0c7cf, -9px -9px 18px #ffffff;
+    }
+
+    button.neu-btn:active {
+      box-shadow: inset 4px 4px 8px #c0c7cf, inset -4px -4px 8px #ffffff;
+    }
+
+    input.neu-input {
+      background: #e8edf2;
+      border: none;
+      border-radius: 30px;
+      box-shadow: inset 4px 4px 8px #c0c7cf, inset -4px -4px 8px #ffffff;
+      padding: 14px 20px;
+      width: 100%;
+      font-size: 1rem;
+      color: #2c3e50;
+      outline: none;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .logo h1 {
+      font-size: 1.6rem;
+      color: #2c3e50;
+    }
+
+    .logo small {
+      color: #5a6c7d;
+      font-size: 0.8rem;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      box-shadow: 4px 4px 8px #c0c7cf, -4px -4px 8px #ffffff;
+      object-fit: cover;
+    }
+
+    /* ===== Search ===== */
+    .search-box {
+      margin-bottom: 25px;
+    }
+
+    /* ===== Grid Quiz ===== */
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .quiz-card {
+      background: #e8edf2;
+      border-radius: 24px;
+      box-shadow: 8px 8px 16px #c0c7cf, -8px -8px 16px #ffffff;
+      padding: 20px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .quiz-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 12px 12px 24px #c0c7cf, -12px -12px 24px #ffffff;
+    }
+
+    .quiz-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .quiz-card .date {
+      color: #5a6c7d;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      background: #e8edf2;
+      box-shadow: inset 2px 2px 5px #c0c7cf, inset -2px -2px 5px #ffffff;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #2c3e50;
+      display: inline-block;
+    }
+
+    /* ===== Leaderboard ===== */
+    .leaderboard-list {
+      list-style: none;
+      margin-top: 10px;
+    }
+
+    .leaderboard-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 15px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      background: #e8edf2;
+      box-shadow: 3px 3px 6px #c0c7cf, -3px -3px 6px #ffffff;
+    }
+
+    /* ===== Auth screen ===== */
+    .auth-screen {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 600px) {
+      .app-container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- Login screen (shown when not authenticated) -->
+    <div id="loginScreen" class="auth-screen">
+      <div class="neu-card" style="max-width: 360px; margin: 0 auto;">
+        <h2 style="margin-bottom: 20px;">🔐 Masuk ke IRMA Quiz</h2>
+        <p style="margin-bottom: 25px; color: #5a6c7d;">Gunakan akun Google untuk melanjutkan</p>
+        <button id="googleLoginBtn" class="neu-btn" style="font-size: 1rem; padding: 14px 28px;">
+          🅖 Masuk dengan Google
+        </button>
+        <p style="margin-top: 20px; font-size: 0.7rem; color: #7f8c8d;">
+          Dengan masuk, kamu setuju dengan ketentuan kuis IRMA Baitussalam
+        </p>
+      </div>
+    </div>
+
+    <!-- Main dashboard (shown after login) -->
+    <div id="dashboardScreen" class="hidden">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo">
+          <h1>📘 IRMA Baitussalam</h1>
+          <small>SMAN 22 Garut · Kuis Interaktif</small>
+        </div>
+        <div class="user-area">
+          <span id="userNameDisplay" style="font-weight: 500;"></span>
+          <img id="userAvatar" class="avatar" src="" alt="avatar" style="display: none;">
+          <button id="logoutBtn" class="neu-btn" style="padding: 8px 16px;">Keluar</button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-box">
+        <input type="text" id="searchInput" class="neu-input" placeholder="🔍 Cari kuis atau materi...">
+      </div>
+
+      <!-- Quiz Section -->
+      <div class="section-title">📚 Kuis Terbaru</div>
+      <div id="quizContainer" class="quiz-grid">
+        <!-- dynamically filled -->
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="neu-card">
+        <div class="section-title" style="margin-bottom: 15px;">🏆 Ranking Peserta</div>
+        <ul id="leaderboardList" class="leaderboard-list">
+          <!-- dynamically filled -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== CONFIGURATION ====================
+    // GANTI dengan konfigurasi Firebase kamu sendiri!
+    const firebaseConfig = {
+      apiKey: "AIzaSyBr8AFNmJRJuL5ZcvehTpXymWqdezXxz5k",
+      authDomain: "diarybrainly.firebaseapp.com",
+      projectId: "diarybrainly",
+      storageBucket: "diarybrainly.firebasestorage.app",
+      messagingSenderId: "859840024435",
+      appId: "1:859840024435:web:844aed0e9b917100f17f06",
+      measurementId: "G-97JWM9KDHC"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ==================== UI ELEMENTS ====================
+    const loginScreen = document.getElementById('loginScreen');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    const userAvatar = document.getElementById('userAvatar');
+    const quizContainer = document.getElementById('quizContainer');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const searchInput = document.getElementById('searchInput');
+
+    // ==================== AUTHENTICATION ====================
+    // Login dengan Google
+    googleLoginBtn.addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          // Sukses login, user dialihkan ke dashboard oleh onAuthStateChanged
+        })
+        .catch((error) => {
+          alert('Login gagal: ' + error.message);
+        });
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // Pantau status autentikasi
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User login
+        loginScreen.classList.add('hidden');
+        dashboardScreen.classList.remove('hidden');
+        userNameDisplay.textContent = user.displayName || 'Peserta';
+        if (user.photoURL) {
+          userAvatar.src = user.photoURL;
+          userAvatar.style.display = 'inline-block';
+        } else {
+          userAvatar.style.display = 'none';
+        }
+        // Muat data setelah login
+        loadQuizzes();
+        loadLeaderboard();
+      } else {
+        // User logout
+        loginScreen.classList.remove('hidden');
+        dashboardScreen.classList.add('hidden');
+      }
+    });
+
+    // ==================== DATA QUIZ (CONTOH) ====================
+    // Dalam production, data ini bisa diambil dari Firestore
+    const sampleQuizzes = [
+      {
+        id: 'q1',
+        title: 'Fiqih Ibadah',
+        date: '2026-05-01',
+        category: 'fiqih',
+        questions: 15
+      },
+      {
+        id: 'q2',
+        title: 'Aqidah Akhlak',
+        date: '2026-04-28',
+        category: 'aqidah',
+        questions: 20
+      },
+      {
+        id: 'q3',
+        title: 'Sejarah Islam',
+        date: '2026-04-25',
+        category: 'sejarah',
+        questions: 10
+      },
+      {
+        id: 'q4',
+        title: 'Al-Quran & Hadits',
+        date: '2026-04-20',
+        category: 'quran',
+        questions: 25
+      },
+      {
+        id: 'q5',
+        title: 'Bahasa Arab',
+        date: '2026-04-15',
+        category: 'bahasa',
+        questions: 18
+      }
+    ];
+
+    // ==================== RENDER QUIZ ====================
+    function renderQuizzes(quizzes) {
+      if (!quizContainer) return;
+      quizContainer.innerHTML = '';
+      if (quizzes.length === 0) {
+        quizContainer.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#5a6c7d;">🔍 Tidak ada kuis ditemukan.</p>';
+        return;
+      }
+      quizzes.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <h3>${q.title}</h3>
+          <div class="date">📅 ${formatDate(q.date)}</div>
+          <span class="badge">${q.questions} soal</span>
+          <span class="badge" style="margin-left:6px;">${q.category}</span>
+        `;
+        card.addEventListener('click', () => {
+          alert(`Kuis "${q.title}" akan segera dimulai! (simulasi)`);
+          // Arahkan ke halaman kuis, misalnya: window.location.href = 'quiz.html?id=' + q.id;
+        });
+        quizContainer.appendChild(card);
+      });
+    }
+
+    function loadQuizzes(filterText = '') {
+      let filtered = sampleQuizzes;
+      if (filterText.trim() !== '') {
+        const keyword = filterText.trim().toLowerCase();
+        filtered = sampleQuizzes.filter(q =>
+          q.title.toLowerCase().includes(keyword) ||
+          q.category.toLowerCase().includes(keyword)
+        );
+      }
+      renderQuizzes(filtered);
+    }
+
+    // Search handler
+    searchInput.addEventListener('input', (e) => {
+      loadQuizzes(e.target.value);
+    });
+
+    // ==================== LEADERBOARD ====================
+    function renderLeaderboard(entries) {
+      if (!leaderboardList) return;
+      leaderboardList.innerHTML = '';
+      if (entries.length === 0) {
+        leaderboardList.innerHTML = '<li style="justify-content:center; color:#5a6c7d;">Belum ada data ranking.</li>';
+        return;
+      }
+      entries.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>🏅 ${index + 1}. ${entry.name || 'Anonim'}</span>
+          <span style="font-weight:700;">${entry.score} poin</span>
+        `;
+        leaderboardList.appendChild(li);
+      });
+    }
+
+    function loadLeaderboard() {
+      // Contoh data statis (diganti dengan data dari Firestore jika perlu)
+      const dummyLeaderboard = [
+        { name: 'Ahmad Fauzi', score: 1250 },
+        { name: 'Siti Nurhaliza', score: 980 },
+        { name: 'Rizky Maulana', score: 870 },
+        { name: 'Dewi Astuti', score: 720 },
+        { name: 'Budi Santoso', score: 650 }
+      ];
+      // Simulasi pengurutan berdasarkan skor tertinggi
+      dummyLeaderboard.sort((a, b) => b.score - a.score);
+      renderLeaderboard(dummyLeaderboard);
+    }
+
+    // ==================== UTILS ====================
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('id-ID', options);
+    }
+
+    // ==================== INISIALISASI ====================
+    // Data kuis awal (jika user sudah login, akan dimuat oleh onAuthStateChanged)
+    window.addEventListener('DOMContentLoaded', () => {
+      // Jika ada user yang sudah login sebelumnya, Firebase akan memanggil onAuthStateChanged
+    });
+  </script>
+</body>
+</html>
