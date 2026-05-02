@@ -11,7 +11,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
-    /* ===== NEUMORPHISM VARIABLES ===== */
     :root {
       --bg: #e8edf2;
       --bg-inset: #e8edf2;
@@ -21,6 +20,7 @@
       --text-secondary: #5a6c7d;
       --card-bg: #e8edf2;
       --btn-bg: #e8edf2;
+      --accent: #2c3e50;
     }
 
     body.dark {
@@ -57,75 +57,112 @@
       min-height: 100vh;
     }
 
-    /* ===== NAVBAR ===== */
-    .navbar {
+    /* ---------- HEADER / NAVBAR ---------- */
+    .app-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: var(--bg);
       border-radius: 24px;
       box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
-      padding: 12px 24px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--text);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .nav-link, .nav-btn {
-      background: var(--btn-bg);
-      border: none;
-      border-radius: 30px;
-      box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
       padding: 10px 20px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 10;
     }
 
-    .nav-link:hover, .nav-btn:hover {
-      box-shadow: 9px 9px 18px var(--shadow-dark), -9px -9px 18px var(--shadow-light);
-    }
-
-    .nav-link:active, .nav-btn:active {
-      box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-    }
-
-    .user-info {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      cursor: pointer;
+      position: relative;
     }
 
     .avatar {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       object-fit: cover;
       box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
     }
 
-    /* ===== CONTAINER ===== */
+    .user-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      background: var(--btn-bg);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .icon-btn:active {
+      box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+    }
+
+    /* Dropdown umum */
+    .dropdown-menu {
+      position: absolute;
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
+      padding: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 20;
+      min-width: 180px;
+    }
+
+    .profile-dropdown {
+      top: 55px;
+      left: 0;
+    }
+
+    .hamburger-dropdown {
+      top: 55px;
+      right: 20px;
+    }
+
+    .dropdown-menu button, .dropdown-menu a {
+      background: var(--btn-bg);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+      text-align: left;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .dropdown-menu button:active {
+      box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+    }
+
+    /* ---------- NEUMORPHIC COMPONENTS ---------- */
     .neu-card {
       background: var(--card-bg);
       border-radius: 24px;
@@ -154,7 +191,6 @@
       outline: none;
     }
 
-    /* ===== QUIZ GRID ===== */
     .section-title {
       font-size: 1.4rem;
       font-weight: 600;
@@ -185,10 +221,10 @@
       box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
     }
 
-    .quiz-card .date {
+    .date {
       color: var(--text-secondary);
       font-size: 0.8rem;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .badge {
@@ -202,7 +238,6 @@
       margin-right: 6px;
     }
 
-    /* ===== RANKING ===== */
     .leaderboard-list {
       list-style: none;
       margin-top: 8px;
@@ -225,17 +260,6 @@
       font-style: italic;
     }
 
-    /* ===== SCREENS ===== */
-    .screen {
-      display: none;
-      flex: 1;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    /* ===== QUIZ INTERFACE ===== */
     .quiz-option {
       display: block;
       width: 100%;
@@ -249,16 +273,11 @@
       color: var(--text);
       font-size: 1rem;
       cursor: pointer;
-      transition: 0.2s;
     }
 
     .quiz-option.selected {
       box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
       font-weight: 700;
-    }
-
-    .quiz-option:active {
-      box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
     }
 
     .progress-bar {
@@ -271,46 +290,86 @@
 
     .progress-fill {
       height: 100%;
-      background: #2c3e50;
+      background: var(--accent);
       border-radius: 8px;
       width: 0%;
     }
 
-    /* ===== RESPONSIVE ===== */
+    .screen {
+      display: none;
+      flex: 1;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Review detail */
+    .review-item {
+      background: var(--bg-inset);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    }
+
+    .correct {
+      color: #27ae60;
+    }
+
+    .wrong {
+      color: #e74c3c;
+    }
+
+    /* Footer */
+    .app-footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--shadow-dark);
+    }
+
     @media (max-width: 600px) {
-      .navbar {
-        flex-direction: column;
-        align-items: flex-start;
+      .quiz-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-wrapper" id="appWrapper">
-    <!-- Navbar (hanya muncul setelah login) -->
-    <nav id="mainNavbar" class="navbar" style="display: none;">
-      <div class="nav-brand">
-        <i class="ti ti-book"></i> IRMA Baitussalam
+  <div class="app-wrapper">
+    <!-- HEADER -->
+    <header id="mainNavbar" class="app-header" style="display: none;">
+      <div class="header-left" id="profileTrigger">
+        <img id="navAvatar" class="avatar" src="" alt="avatar" style="display:none;">
+        <span id="navUserName" class="user-name"></span>
+        <i class="ti ti-chevron-down" style="font-size: 0.8rem;"></i>
       </div>
-      <div class="nav-links">
-        <button id="navHome" class="nav-link"><i class="ti ti-home"></i> Beranda</button>
-        <button id="navContact" class="nav-link"><i class="ti ti-mail"></i> Kontak</button>
-        <button id="toggleTheme" class="nav-btn"><i class="ti ti-sun"></i> <span id="themeIconText">Gelap</span></button>
-        <div class="user-info">
-          <img id="navAvatar" class="avatar" src="" alt="avatar" style="display: none;">
-          <span id="navUserName"></span>
-        </div>
-        <button id="logoutBtn" class="nav-link"><i class="ti ti-logout"></i> Keluar</button>
+      <div class="header-right">
+        <button id="hamburgerBtn" class="icon-btn"><i class="ti ti-menu-2"></i></button>
       </div>
-    </nav>
+      <!-- Dropdown profil -->
+      <div id="profileDropdown" class="dropdown-menu profile-dropdown">
+        <p style="font-weight:600; margin-bottom:8px;" id="profileName"></p>
+        <button id="logoutBtnFromDropdown"><i class="ti ti-logout"></i> Keluar</button>
+      </div>
+      <!-- Dropdown hamburger -->
+      <div id="hamburgerDropdown" class="dropdown-menu hamburger-dropdown">
+        <button id="navHome"><i class="ti ti-home"></i> Beranda</button>
+        <button id="navContact"><i class="ti ti-mail"></i> Kontak</button>
+        <button id="toggleTheme"><i class="ti ti-moon"></i></button>
+      </div>
+    </header>
 
-    <!-- LOGIN SCREEN -->
+    <!-- SCREENS -->
     <div id="loginScreen" class="screen active">
       <div class="neu-card" style="max-width: 400px; margin: 60px auto; text-align: center;">
         <i class="ti ti-book" style="font-size: 3rem; color: var(--text);"></i>
         <h2 style="margin: 16px 0;">Masuk ke IRMA Quiz</h2>
         <p style="color: var(--text-secondary); margin-bottom: 24px;">Gunakan akun Google untuk melanjutkan</p>
-        <button id="googleLoginBtn" class="nav-btn" style="font-size: 1rem; padding: 14px 28px;">
+        <button id="googleLoginBtn" class="icon-btn" style="width: auto; padding: 14px 28px; border-radius: 30px; font-size: 1rem;">
           <i class="ti ti-brand-google"></i> Masuk dengan Google
         </button>
         <p style="margin-top: 20px; font-size: 0.75rem; color: var(--text-secondary);">
@@ -319,10 +378,9 @@
       </div>
     </div>
 
-    <!-- DASHBOARD SCREEN (Beranda) -->
     <div id="dashboardScreen" class="screen">
-      <div class="search-box neu-inset">
-        <i class="ti ti-search" style="position: absolute; margin: 14px 0 0 16px; color: var(--text-secondary);"></i>
+      <div class="neu-inset" style="position: relative;">
+        <i class="ti ti-search" style="position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
         <input type="text" id="searchInput" class="neu-input" placeholder="Cari kuis atau materi..." style="padding-left: 44px;">
       </div>
 
@@ -336,7 +394,6 @@
       </div>
     </div>
 
-    <!-- KONTAK SCREEN -->
     <div id="contactScreen" class="screen">
       <div class="neu-card" style="max-width: 600px; margin: 0 auto;">
         <h2 style="margin-bottom: 16px;"><i class="ti ti-mail"></i> Kontak Kami</h2>
@@ -347,7 +404,6 @@
       </div>
     </div>
 
-    <!-- QUIZ PLAY SCREEN -->
     <div id="quizScreen" class="screen">
       <div class="neu-card" id="quizCard">
         <h2 id="quizTitle"></h2>
@@ -356,30 +412,33 @@
         <p id="questionText" style="margin: 12px 0;"></p>
         <div id="optionsContainer"></div>
         <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-          <button id="prevQuestionBtn" class="nav-btn"><i class="ti ti-arrow-left"></i> Sebelumnya</button>
-          <button id="nextQuestionBtn" class="nav-btn">Selanjutnya <i class="ti ti-arrow-right"></i></button>
+          <button id="prevQuestionBtn" class="icon-btn" style="width: auto; padding: 10px 20px; border-radius: 30px;"><i class="ti ti-arrow-left"></i> Sebelumnya</button>
+          <button id="nextQuestionBtn" class="icon-btn" style="width: auto; padding: 10px 20px; border-radius: 30px;">Selanjutnya <i class="ti ti-arrow-right"></i></button>
         </div>
-        <button id="submitQuizBtn" class="nav-btn" style="width:100%; margin-top:12px; display:none;">
-          <i class="ti ti-check"></i> Selesai & Lihat Skor
-        </button>
+        <button id="submitQuizBtn" class="icon-btn" style="width:100%; margin-top:12px; display:none; border-radius: 30px;"><i class="ti ti-check"></i> Selesai & Lihat Skor</button>
       </div>
     </div>
 
-    <!-- RESULT SCREEN -->
     <div id="resultScreen" class="screen">
-      <div class="neu-card" style="text-align: center; max-width: 500px; margin: 0 auto;">
-        <i class="ti ti-rosette" style="font-size: 3rem;"></i>
-        <h2>Kuis Selesai!</h2>
-        <p style="font-size: 1.2rem; margin: 12px 0;">Skor kamu: <strong id="resultScore"></strong></p>
-        <p id="resultDetail"></p>
-        <button id="backToHomeBtn" class="nav-btn" style="margin-top: 20px;"><i class="ti ti-home"></i> Kembali ke Beranda</button>
+      <div class="neu-card" style="max-width: 700px; margin: 0 auto;">
+        <div id="resultSummary" style="text-align: center;">
+          <i class="ti ti-rosette" style="font-size:3rem;"></i>
+          <h2>Kuis Selesai!</h2>
+          <p style="font-size:1.2rem;">Skor kamu: <strong id="resultScore"></strong></p>
+        </div>
+        <div id="reviewContainer" style="margin-top: 20px;"></div>
+        <button id="backToHomeBtn" class="icon-btn" style="width: auto; margin: 20px auto 0; padding: 12px 24px; border-radius: 30px;"><i class="ti ti-home"></i> Kembali ke Beranda</button>
       </div>
     </div>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      2014–<span id="currentYear"></span> IRMA Baitussalam
+    </footer>
   </div>
 
   <script>
-    // ==================== CONFIGURATION ====================
-    // GANTI dengan konfigurasi Firebase kamu!
+    // ==================== GANTI KONFIGURASI FIREBASE DI SINI ====================
     const firebaseConfig = {
       apiKey: "AIzaSyAhJNw0GIs1lPxOHMws-C9M3ot8SO-2dJE",
       authDomain: "irma-baitussalam.firebaseapp.com",
@@ -390,19 +449,11 @@
       measurementId: "G-F2NJTHQ7CT"
     };
 
-    // Inisialisasi Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore(); // Jika ingin pakai Firestore, sesuaikan
+    const db = firebase.firestore();
 
-    // ==================== GLOBAL STATE ====================
-    let currentUser = null;
-    let currentQuiz = null;         // objek kuis yang sedang dikerjakan
-    let currentQuestionIndex = 0;
-    let userAnswers = [];          // indeks jawaban user
-    const LEADERBOARD_KEY = 'irmaQuizLeaderboard';
-
-    // ==================== DATA SAMPLE QUIZ ====================
+    // ==================== DATA QUIZ (SUPPORT HTML DI SOAL & PENJELASAN) ====================
     const sampleQuizzes = [
       {
         id: 'q1',
@@ -410,11 +461,36 @@
         date: '2026-05-01',
         category: 'fiqih',
         questions: [
-          { question: 'Rukun Islam yang pertama adalah...', options: ['Shalat', 'Puasa', 'Syahadat', 'Zakat'], answer: 2 },
-          { question: 'Shalat wajib sehari semalam berjumlah...', options: ['3', '4', '5', '6'], answer: 2 },
-          { question: 'Zakat fitrah wajib dikeluarkan pada bulan...', options: ['Muharram', 'Ramadhan', 'Syawal', 'Dzulhijjah'], answer: 1 },
-          { question: 'Haji merupakan rukun Islam ke...', options: ['3', '4', '5', '6'], answer: 2 },
-          { question: 'Puasa Ramadhan hukumnya...', options: ['Sunnah', 'Wajib', 'Mubah', 'Makruh'], answer: 1 }
+          {
+            question: 'Rukun Islam yang <b>pertama</b> adalah...',
+            options: ['Shalat', 'Puasa', '<i>Syahadat</i>', 'Zakat'],
+            answer: 2,
+            explanation: '<b>Syahadat</b> adalah pengakuan bahwa tiada Tuhan selain Allah dan Muhammad adalah utusan Allah.'
+          },
+          {
+            question: 'Shalat wajib sehari semalam berjumlah...',
+            options: ['3', '4', '5', '6'],
+            answer: 2,
+            explanation: 'Shalat wajib ada <u>5 waktu</u>: Subuh, Zuhur, Asar, Magrib, Isya.'
+          },
+          {
+            question: 'Zakat fitrah wajib dikeluarkan pada bulan...',
+            options: ['Muharram', 'Ramadhan', 'Syawal', 'Dzulhijjah'],
+            answer: 1,
+            explanation: 'Zakat fitrah dikeluarkan pada bulan <b>Ramadhan</b> sebelum shalat Idul Fitri.'
+          },
+          {
+            question: 'Haji merupakan rukun Islam ke...',
+            options: ['3', '4', '5', '6'],
+            answer: 2,
+            explanation: 'Haji adalah rukun Islam <b>kelima</b> bagi yang mampu.'
+          },
+          {
+            question: 'Puasa Ramadhan hukumnya...',
+            options: ['Sunnah', 'Wajib', 'Mubah', 'Makruh'],
+            answer: 1,
+            explanation: 'Puasa Ramadhan hukumnya <b>wajib</b> bagi setiap Muslim yang baligh dan mampu.'
+          }
         ]
       },
       {
@@ -423,9 +499,24 @@
         date: '2026-04-28',
         category: 'aqidah',
         questions: [
-          { question: 'Sifat wajib bagi Allah yang berarti "Maha Mengetahui" adalah...', options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'], answer: 0 },
-          { question: 'Nabi yang menerima kitab Zabur adalah...', options: ['Musa', 'Isa', 'Daud', 'Muhammad'], answer: 2 },
-          { question: 'Jumlah malaikat yang wajib diketahui ada...', options: ['7', '10', '12', '25'], answer: 1 }
+          {
+            question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...',
+            options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'],
+            answer: 0,
+            explanation: '<b>Al-Alim</b> artinya Maha Mengetahui. <br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).'
+          },
+          {
+            question: 'Nabi yang menerima kitab <u>Zabur</u> adalah...',
+            options: ['Musa', 'Isa', 'Daud', 'Muhammad'],
+            answer: 2,
+            explanation: 'Kitab Zabur diturunkan kepada <b>Nabi Daud AS</b>.'
+          },
+          {
+            question: 'Jumlah malaikat yang wajib diketahui ada...',
+            options: ['7', '10', '12', '25'],
+            answer: 1,
+            explanation: 'Ada <b>10</b> malaikat yang wajib diketahui: Jibril, Mikail, Israfil, Izrail, Munkar, Nakir, Raqib, Atid, Malik, Ridwan.'
+          }
         ]
       },
       {
@@ -434,111 +525,130 @@
         date: '2026-04-25',
         category: 'sejarah',
         questions: [
-          { question: 'Perang Badar terjadi pada tahun ... Hijriyah', options: ['1', '2', '3', '4'], answer: 1 },
-          { question: 'Khalifah pertama umat Islam adalah...', options: ['Umar', 'Abu Bakar', 'Utsman', 'Ali'], answer: 1 }
+          {
+            question: 'Perang Badar terjadi pada tahun ... Hijriyah',
+            options: ['1', '2', '3', '4'],
+            answer: 1,
+            explanation: 'Perang Badar terjadi pada <b>17 Ramadhan 2 H</b>.'
+          },
+          {
+            question: 'Khalifah pertama umat Islam adalah...',
+            options: ['Umar', '<b>Abu Bakar</b>', 'Utsman', 'Ali'],
+            answer: 1,
+            explanation: '<b>Abu Bakar Ash-Shiddiq</b> adalah khalifah pertama setelah wafatnya Rasulullah.'
+          }
         ]
       }
     ];
 
+    // ==================== GLOBAL STATE ====================
+    let currentUser = null;
+    let currentQuiz = null;
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+
     // ==================== UI ELEMENTS ====================
-    const screens = {
-      login: document.getElementById('loginScreen'),
-      dashboard: document.getElementById('dashboardScreen'),
-      contact: document.getElementById('contactScreen'),
-      quiz: document.getElementById('quizScreen'),
-      result: document.getElementById('resultScreen')
-    };
     const mainNavbar = document.getElementById('mainNavbar');
-    const navHome = document.getElementById('navHome');
-    const navContact = document.getElementById('navContact');
-    const toggleThemeBtn = document.getElementById('toggleTheme');
-    const themeIconText = document.getElementById('themeIconText');
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const hamburgerDropdown = document.getElementById('hamburgerDropdown');
     const navAvatar = document.getElementById('navAvatar');
     const navUserName = document.getElementById('navUserName');
-    const logoutBtn = document.getElementById('logoutBtn');
+    const profileName = document.getElementById('profileName');
+    const logoutDropdown = document.getElementById('logoutBtnFromDropdown');
+    const toggleThemeBtn = document.getElementById('toggleTheme');
+    const navHome = document.getElementById('navHome');
+    const navContact = document.getElementById('navContact');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const searchInput = document.getElementById('searchInput');
     const quizContainer = document.getElementById('quizContainer');
     const leaderboardList = document.getElementById('leaderboardList');
     const leaderboardEmpty = document.getElementById('leaderboardEmpty');
 
-    // Quiz screen
     const quizTitle = document.getElementById('quizTitle');
     const progressFill = document.getElementById('progressFill');
     const questionNumber = document.getElementById('questionNumber');
     const questionText = document.getElementById('questionText');
     const optionsContainer = document.getElementById('optionsContainer');
-    const prevQuestionBtn = document.getElementById('prevQuestionBtn');
-    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
-    const submitQuizBtn = document.getElementById('submitQuizBtn');
+    const prevBtn = document.getElementById('prevQuestionBtn');
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    const submitBtn = document.getElementById('submitQuizBtn');
     const resultScore = document.getElementById('resultScore');
-    const resultDetail = document.getElementById('resultDetail');
+    const reviewContainer = document.getElementById('reviewContainer');
     const backToHomeBtn = document.getElementById('backToHomeBtn');
 
-    // ==================== SCREEN NAVIGATION ====================
-    function showScreen(screenId) {
-      Object.keys(screens).forEach(key => {
-        screens[key].classList.remove('active');
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // ==================== SCREEN MANAGEMENT ====================
+    function showScreen(id) {
+      ['loginScreen','dashboardScreen','contactScreen','quizScreen','resultScreen'].forEach(s => {
+        document.getElementById(s).classList.remove('active');
       });
-      screens[screenId].classList.add('active');
-      // Toggle navbar hanya di luar login
-      if (screenId === 'login') {
-        mainNavbar.style.display = 'none';
-      } else {
-        mainNavbar.style.display = 'flex';
-      }
+      document.getElementById(id).classList.add('active');
+      mainNavbar.style.display = (id === 'loginScreen') ? 'none' : 'flex';
     }
 
-    // ==================== AUTHENTICATION ====================
+    // ==================== AUTH ====================
     googleLoginBtn.addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(error => alert('Login gagal: ' + error.message));
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert(e.message));
     });
-
-    logoutBtn.addEventListener('click', () => {
-      auth.signOut();
-    });
+    logoutDropdown.addEventListener('click', () => auth.signOut());
 
     auth.onAuthStateChanged(user => {
       if (user) {
-        currentUser = {
-          uid: user.uid,
-          displayName: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        };
+        currentUser = { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL };
         navUserName.textContent = user.displayName || 'Peserta';
+        profileName.textContent = user.displayName || 'Peserta';
         if (user.photoURL) {
           navAvatar.src = user.photoURL;
           navAvatar.style.display = 'inline-block';
         } else {
           navAvatar.style.display = 'none';
         }
-        showScreen('dashboard');
+        showScreen('dashboardScreen');
         loadQuizzes();
         loadLeaderboard();
       } else {
         currentUser = null;
-        showScreen('login');
+        showScreen('loginScreen');
+        profileDropdown.style.display = 'none';
+        hamburgerDropdown.style.display = 'none';
       }
     });
 
-    // ==================== THEME TOGGLE ====================
+    // ==================== DROPDOWN ====================
+    profileTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
+      hamburgerDropdown.style.display = 'none';
+    });
+    hamburgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hamburgerDropdown.style.display = hamburgerDropdown.style.display === 'flex' ? 'none' : 'flex';
+      profileDropdown.style.display = 'none';
+    });
+    document.addEventListener('click', () => {
+      profileDropdown.style.display = 'none';
+      hamburgerDropdown.style.display = 'none';
+    });
+
+    // ==================== THEME ====================
     toggleThemeBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark');
-      const isDark = document.body.classList.contains('dark');
-      toggleThemeBtn.innerHTML = isDark ? '<i class="ti ti-sun"></i> Terang' : '<i class="ti ti-moon"></i> Gelap';
+      const icon = toggleThemeBtn.querySelector('i');
+      if (document.body.classList.contains('dark')) {
+        icon.className = 'ti ti-sun';
+      } else {
+        icon.className = 'ti ti-moon';
+      }
     });
 
     // ==================== NAVIGATION ====================
-    navHome.addEventListener('click', () => {
-      showScreen('dashboard');
-    });
-    navContact.addEventListener('click', () => {
-      showScreen('contact');
-    });
+    navHome.addEventListener('click', () => { showScreen('dashboardScreen'); hamburgerDropdown.style.display = 'none'; });
+    navContact.addEventListener('click', () => { showScreen('contactScreen'); hamburgerDropdown.style.display = 'none'; });
 
-    // ==================== RENDER QUIZ LIST ====================
+    // ==================== QUIZ LIST & SEARCH ====================
     function renderQuizzes(quizzes) {
       quizContainer.innerHTML = '';
       if (quizzes.length === 0) {
@@ -550,159 +660,192 @@
         card.className = 'quiz-card';
         card.innerHTML = `
           <h3>${q.title}</h3>
-          <div class="date"><i class="ti ti-calendar"></i> ${formatDate(q.date)}</div>
+          <div class="date"><i class="ti ti-calendar"></i> ${new Date(q.date).toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'})}</div>
           <span class="badge">${q.questions.length} soal</span>
           <span class="badge">${q.category}</span>
         `;
-        card.addEventListener('click', () => startQuiz(q));
+        card.addEventListener('click', () => handleQuizClick(q));
         quizContainer.appendChild(card);
       });
     }
 
-    function loadQuizzes(filterText = '') {
-      let filtered = sampleQuizzes;
-      if (filterText.trim() !== '') {
-        const keyword = filterText.trim().toLowerCase();
-        filtered = sampleQuizzes.filter(q => q.title.toLowerCase().includes(keyword) || q.category.toLowerCase().includes(keyword));
+    function loadQuizzes(filter = '') {
+      let list = sampleQuizzes;
+      if (filter.trim()) {
+        const kw = filter.trim().toLowerCase();
+        list = sampleQuizzes.filter(q => q.title.toLowerCase().includes(kw) || q.category.toLowerCase().includes(kw));
       }
-      renderQuizzes(filtered);
+      renderQuizzes(list);
     }
-
     searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-    // ==================== LEADERBOARD ====================
-    function getLeaderboardFromStorage() {
-      const data = localStorage.getItem(LEADERBOARD_KEY);
-      return data ? JSON.parse(data) : [];
+    // ==================== FIRESTORE: ATTEMPTS ====================
+    function getUserAttemptDocId(quizId) {
+      return `${currentUser.uid}_${quizId}`;
     }
 
-    function saveScoreToLeaderboard(quizId, score) {
-      if (!currentUser) return;
-      const entry = {
+    async function getUserAttempt(quizId) {
+      const docRef = db.collection('attempts').doc(getUserAttemptDocId(quizId));
+      const doc = await docRef.get();
+      return doc.exists ? doc.data() : null;
+    }
+
+    async function saveAttempt(quizId, answers, score) {
+      const docRef = db.collection('attempts').doc(getUserAttemptDocId(quizId));
+      await docRef.set({
+        uid: currentUser.uid,
         email: currentUser.email,
-        name: currentUser.displayName,
-        quizId: quizId,
-        score: score,
-        date: new Date().toISOString()
-      };
-      const leaderboard = getLeaderboardFromStorage();
-      leaderboard.push(entry);
-      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
+        quizId,
+        answers,
+        score,
+        date: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // update leaderboard
+      await addToLeaderboard(score);
     }
 
-    function loadLeaderboard() {
-      const leaderboard = getLeaderboardFromStorage();
-      if (leaderboard.length === 0) {
-        leaderboardList.innerHTML = '';
-        leaderboardEmpty.style.display = 'block';
-        return;
+    async function handleQuizClick(quiz) {
+      if (!currentUser) return;
+      const attempt = await getUserAttempt(quiz.id);
+      if (attempt) {
+        showReviewScreen(quiz, attempt.answers, attempt.score);
+      } else {
+        startQuiz(quiz);
       }
-      leaderboardEmpty.style.display = 'none';
-      // Aggregate total score per user
-      const userScores = {};
-      leaderboard.forEach(entry => {
-        if (!userScores[entry.email]) {
-          userScores[entry.email] = { name: entry.name, total: 0 };
-        }
-        userScores[entry.email].total += entry.score;
-      });
-      const sorted = Object.values(userScores).sort((a, b) => b.total - a.total);
-      leaderboardList.innerHTML = '';
-      sorted.forEach((u, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${u.total} poin</strong>`;
-        leaderboardList.appendChild(li);
-      });
     }
 
-    // ==================== QUIZ LOGIC ====================
     function startQuiz(quiz) {
       currentQuiz = quiz;
       currentQuestionIndex = 0;
       userAnswers = new Array(quiz.questions.length).fill(null);
-      showScreen('quiz');
+      showScreen('quizScreen');
       renderQuestion();
     }
 
     function renderQuestion() {
-      if (!currentQuiz) return;
       const q = currentQuiz.questions[currentQuestionIndex];
       quizTitle.textContent = currentQuiz.title;
-      questionNumber.textContent = `Soal ${currentQuestionIndex + 1} dari ${currentQuiz.questions.length}`;
-      questionText.textContent = q.question;
-      progressFill.style.width = ((currentQuestionIndex + 1) / currentQuiz.questions.length * 100) + '%';
-
+      questionNumber.textContent = `Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
+      questionText.innerHTML = q.question; // HTML support
+      progressFill.style.width = ((currentQuestionIndex+1)/currentQuiz.questions.length*100)+'%';
       optionsContainer.innerHTML = '';
       q.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
-        if (userAnswers[currentQuestionIndex] === idx) {
-          btn.classList.add('selected');
-        }
-        btn.textContent = opt;
-        btn.addEventListener('click', () => selectAnswer(idx));
+        if (userAnswers[currentQuestionIndex] === idx) btn.classList.add('selected');
+        btn.innerHTML = opt; // HTML support
+        btn.addEventListener('click', () => {
+          userAnswers[currentQuestionIndex] = idx;
+          renderQuestion();
+        });
         optionsContainer.appendChild(btn);
       });
-
-      // Update navigation buttons
-      prevQuestionBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'inline-flex';
+      prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'inline-flex';
       if (currentQuestionIndex === currentQuiz.questions.length - 1) {
-        nextQuestionBtn.style.display = 'none';
-        submitQuizBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
       } else {
-        nextQuestionBtn.style.display = 'inline-flex';
-        submitQuizBtn.style.display = 'none';
+        nextBtn.style.display = 'inline-flex';
+        submitBtn.style.display = 'none';
       }
     }
 
-    function selectAnswer(optionIndex) {
-      userAnswers[currentQuestionIndex] = optionIndex;
-      renderQuestion(); // refresh to show selected
-    }
-
-    prevQuestionBtn.addEventListener('click', () => {
+    prevBtn.addEventListener('click', () => {
       if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         renderQuestion();
       }
     });
-
-    nextQuestionBtn.addEventListener('click', () => {
+    nextBtn.addEventListener('click', () => {
       if (currentQuestionIndex < currentQuiz.questions.length - 1) {
         currentQuestionIndex++;
         renderQuestion();
       }
     });
+    submitBtn.addEventListener('click', finishQuiz);
 
-    submitQuizBtn.addEventListener('click', () => {
-      // Hitung skor
+    async function finishQuiz() {
       let score = 0;
       currentQuiz.questions.forEach((q, i) => {
         if (userAnswers[i] === q.answer) score++;
       });
-      // Simpan ke leaderboard
-      saveScoreToLeaderboard(currentQuiz.id, score);
-      // Tampilkan hasil
-      resultScore.textContent = `${score} / ${currentQuiz.questions.length}`;
-      resultDetail.textContent = `Kuis: ${currentQuiz.title}`;
-      showScreen('result');
-      loadLeaderboard(); // refresh ranking
-    });
-
-    backToHomeBtn.addEventListener('click', () => {
-      showScreen('dashboard');
-      loadLeaderboard();
-    });
-
-    // ==================== UTILS ====================
-    function formatDate(dateString) {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('id-ID', options);
+      await saveAttempt(currentQuiz.id, [...userAnswers], score);
+      showReviewScreen(currentQuiz, userAnswers, score);
     }
 
-    // ==================== INITIAL LOAD ====================
-    // Set default theme icon
-    toggleThemeBtn.innerHTML = '<i class="ti ti-moon"></i> Gelap';
+    // ==================== FIRESTORE: LEADERBOARD ====================
+    async function addToLeaderboard(score) {
+      const leaderDocRef = db.collection('leaderboard').doc(currentUser.uid);
+      const doc = await leaderDocRef.get();
+      if (doc.exists) {
+        await leaderDocRef.update({
+          totalScore: firebase.firestore.FieldValue.increment(score)
+        });
+      } else {
+        await leaderDocRef.set({
+          uid: currentUser.uid,
+          name: currentUser.displayName,
+          totalScore: score
+        });
+      }
+    }
+
+    async function loadLeaderboard() {
+      try {
+        const snapshot = await db.collection('leaderboard')
+          .orderBy('totalScore', 'desc')
+          .limit(20)
+          .get();
+        if (snapshot.empty) {
+          leaderboardList.innerHTML = '';
+          leaderboardEmpty.style.display = 'block';
+          return;
+        }
+        leaderboardEmpty.style.display = 'none';
+        let html = '';
+        snapshot.forEach((doc, index) => {
+          const data = doc.data();
+          html += `
+            <li>
+              <span><i class="ti ti-medal"></i> ${index+1}. ${data.name}</span>
+              <strong>${data.totalScore} poin</strong>
+            </li>
+          `;
+        });
+        leaderboardList.innerHTML = html;
+      } catch (error) {
+        console.error('Error memuat leaderboard:', error);
+        leaderboardList.innerHTML = '<li class="empty-message">Gagal memuat ranking.</li>';
+        leaderboardEmpty.style.display = 'none';
+      }
+    }
+
+    // ==================== REVIEW SCREEN ====================
+    function showReviewScreen(quiz, answers, score) {
+      currentQuiz = quiz;
+      resultScore.textContent = `${score} / ${quiz.questions.length}`;
+      let html = '';
+      quiz.questions.forEach((q, i) => {
+        const userAns = answers[i];
+        const isCorrect = userAns === q.answer;
+        const statusIcon = isCorrect ? '<i class="ti ti-check correct"></i>' : '<i class="ti ti-x wrong"></i>';
+        html += `
+          <div class="review-item">
+            <p><strong>Soal ${i+1}:</strong> ${q.question} ${statusIcon}</p>
+            <p>Jawaban kamu: <span class="${isCorrect ? 'correct' : 'wrong'}">${userAns !== null && userAns !== undefined ? q.options[userAns] : 'Tidak dijawab'}</span></p>
+            ${!isCorrect ? `<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>` : ''}
+            <p style="font-style:italic; margin-top:6px;">📘 ${q.explanation}</p>
+          </div>
+        `;
+      });
+      reviewContainer.innerHTML = html;
+      showScreen('resultScreen');
+    }
+
+    backToHomeBtn.addEventListener('click', () => {
+      showScreen('dashboardScreen');
+      loadLeaderboard();
+    });
   </script>
 </body>
 </html>
