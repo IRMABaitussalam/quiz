@@ -136,9 +136,9 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .leaderboard-list { list-style:none; margin-top:8px; }
 .leaderboard-list li {
   display: grid;
-  grid-template-columns: 30px 1fr auto;
+  grid-template-columns: auto 1fr auto;
   gap: 10px;
-  align-items: center;
+  align-items: baseline;          /* nomor & poin sejajar dengan baris pertama nama */
   padding: 12px 16px;
   border-radius: 16px;
   margin-bottom: 8px;
@@ -147,21 +147,23 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   color: var(--text);
 }
 
-/* Nomor ranking */
 .rank-number {
   font-weight: 600;
   text-align: right;
   white-space: nowrap;
+  min-width: 25px;               /* lebar minimal biar nomor rapi */
 }
 
-/* Nama */
+.rank-name-wrapper {
+  display: flex;
+  align-items: baseline;         /* ikon & teks sejajar */
+}
+
 .rank-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* Poin */
 .rank-score {
   text-align: right;
   font-weight: 600;

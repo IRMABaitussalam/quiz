@@ -312,7 +312,10 @@ function renderLeaderboardArray(arr) {
     const li = document.createElement('li');
     li.innerHTML = `
       <span class="rank-number">${i + 1}.</span>
-      <span class="rank-name"><i class="ti ti-medal"></i> ${item.name}</span>
+      <span class="rank-name-wrapper">
+        <i class="ti ti-medal"></i>
+        <span class="rank-name">${item.name}</span>
+      </span>
       <span class="rank-score"><strong>${item.score} poin</strong></span>
     `;
     leaderboardList.appendChild(li);
