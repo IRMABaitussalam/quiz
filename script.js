@@ -205,9 +205,9 @@ function renderQuizzes(quizzes) {
     const card = document.createElement('div');
     card.className = 'quiz-card';
     let html = `<h3>${q.title}</h3>`;
+    if (q.description) html += `<p class="description">${q.description}</p>`;
     html += `<div class="date"><i class="ti ti-calendar"></i> ${new Date(q.date).toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'})}</div>`;
     html += `<span class="badge">${q.questions.length} soal</span><span class="badge">${q.category}</span>`;
-    if (q.description) html += `<p class="description">${q.description}</p>`;
     card.innerHTML = html;
     card.addEventListener('click', () => navigateToQuiz(q));
     quizContainer.appendChild(card);
