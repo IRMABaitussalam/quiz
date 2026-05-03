@@ -1,4 +1,3 @@
-// Konfigurasi Firebase – GANTI DENGAN PUNYAMU
 const firebaseConfig = {
   apiKey: "AIzaSyAhJNw0GIs1lPxOHMws-C9M3ot8SO-2dJE",
   authDomain: "irma-baitussalam.firebaseapp.com",
@@ -13,14 +12,14 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ==================== STATE ====================
+// State
 let currentUser = null;
 let currentQuiz = null;
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let sampleQuizzes = [];
 
-// ==================== DOM ====================
+// DOM
 const $ = (id) => document.getElementById(id);
 const mainNavbar = $('mainNavbar');
 const profileTrigger = $('profileTrigger');
@@ -51,14 +50,13 @@ const backToHomeBtn = $('backToHomeBtn');
 
 $('currentYear').textContent = new Date().getFullYear();
 
-// ==================== SCREEN ====================
 function showScreen(id) {
   ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(s => $(s).classList.remove('active'));
   const el = $(id); if (el) el.classList.add('active');
   if (mainNavbar) mainNavbar.style.display = (id === 'loginScreen') ? 'none' : 'flex';
 }
 
-// ==================== AUTH ====================
+// Auth
 googleLoginBtn.addEventListener('click', () => {
   auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('Login gagal: ' + e.message));
 });
@@ -82,7 +80,7 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// ==================== DROPDOWN & HAMBURGER ====================
+// Dropdown & hamburger
 profileTrigger.addEventListener('click', (e) => {
   e.stopPropagation();
   profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
@@ -102,12 +100,11 @@ document.addEventListener('click', () => {
   if (hamburgerBtn) hamburgerBtn.classList.remove('open');
 });
 
-// ==================== NAVIGATION ====================
 function goHome() { showScreen('dashboardScreen'); window.location.hash = ''; hamburgerDropdown.style.display='none'; if(hamburgerBtn) hamburgerBtn.classList.remove('open'); }
 navHomeDesktop.addEventListener('click', goHome);
 navHomeMobile.addEventListener('click', goHome);
 
-// ==================== HASH ROUTING ====================
+// Hash routing
 function slugify(text) { return text.toLowerCase().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').replace(/^-+|-+$/g,''); }
 function checkHash() {
   const hash = window.location.hash.replace('#/','');
@@ -119,7 +116,7 @@ function checkHash() {
 window.addEventListener('hashchange', checkHash);
 function navigateToQuiz(quiz) { window.location.hash = '#/' + slugify(quiz.title); }
 
-// ==================== SKELETON ====================
+// Skeleton
 function renderSkeletonQuizzes() {
   quizContainer.innerHTML = '';
   for (let i=0;i<6;i++) { const c=document.createElement('div'); c.className='quiz-card skeleton'; c.innerHTML='<div class="skeleton-title"></div><div class="skeleton-meta"></div><div class="skeleton-badges"></div>'; quizContainer.appendChild(c); }
@@ -129,7 +126,7 @@ function renderSkeletonLeaderboard() {
   for (let i=0;i<5;i++) { const li=document.createElement('li'); li.innerHTML='<div class="skeleton-leaderboard"></div>'; leaderboardList.appendChild(li); }
 }
 
-// ==================== QUIZ LIST ====================
+// Quiz list dengan deskripsi
 function renderQuizzes(quizzes) {
   quizContainer.innerHTML = '';
   if (!quizzes.length) { quizContainer.innerHTML='<p class="empty-message">Belum ada kuis</p>'; return; }
@@ -142,12 +139,19 @@ function renderQuizzes(quizzes) {
 }
 function loadQuizzes(filter='') {
   let list = sampleQuizzes;
-  if (filter.trim()) { const kw=filter.trim().toLowerCase(); list=sampleQuizzes.filter(q=>q.title.toLowerCase().includes(kw)||q.category.toLowerCase().includes(kw)); }
+  if (filter.trim()) {
+    const kw = filter.trim().toLowerCase();
+    list = sampleQuizzes.filter(q =>
+      q.title.toLowerCase().includes(kw) ||
+      q.category.toLowerCase().includes(kw) ||
+      (q.description && q.description.toLowerCase().includes(kw))
+    );
+  }
   renderQuizzes(list);
 }
 searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-// ==================== FIRESTORE + LOCAL FALLBACK ====================
+// Firestore + local fallback dengan perbaikan NaN
 const ATTEMPTS_KEY='irmaQuizAttempts_local', LEADERBOARD_KEY='irmaQuizLeaderboard_local';
 function getLocalAttempts() { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}'); }
 function saveLocalAttempt(qid,ans,score) { const a=getLocalAttempts(); if(!a[currentUser.email]) a[currentUser.email]={}; a[currentUser.email][qid]={answers:ans,score,date:new Date().toISOString()}; localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(a)); }
@@ -175,15 +179,27 @@ async function loadLeaderboard() {
   try {
     const snap=await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get(); leaderboardList.innerHTML='';
     if(snap.empty){leaderboardEmpty.style.display='block';return;} leaderboardEmpty.style.display='none';
-    snap.forEach((d,i)=>{const data=d.data();const li=document.createElement('li');li.innerHTML=`<span><i class="ti ti-medal"></i> ${i+1}. ${data.name}</span> <strong>${safeNum(data.totalScore)} poin</strong>`;leaderboardList.appendChild(li);});
+    snap.forEach((d,i)=>{
+      const data=d.data();
+      const name = data.name || 'Tanpa Nama';
+      const score = safeNum(data.totalScore);
+      const li = document.createElement('li');
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
+      leaderboardList.appendChild(li);
+    });
   } catch(e){
     const l=getLocalLeaderboard(); leaderboardList.innerHTML=''; if(!l.length){leaderboardEmpty.style.display='block';return;} leaderboardEmpty.style.display='none';
     l.sort((a,b)=>safeNum(b.totalScore)-safeNum(a.totalScore));
-    l.forEach((u,i)=>{const li=document.createElement('li');li.innerHTML=`<span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;leaderboardList.appendChild(li);});
+    l.forEach((u,i)=>{
+      const name = u.name || 'Tanpa Nama';
+      const li = document.createElement('li');
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
+      leaderboardList.appendChild(li);
+    });
   }
 }
 
-// ==================== QUIZ ENGINE ====================
+// Quiz engine
 async function handleQuizClick(quiz) {
   if(!currentUser)return;
   const att=await getUserAttempt(quiz.id);
@@ -224,7 +240,7 @@ function showReviewScreen(quiz,answers,score) {
 }
 backToHomeBtn.addEventListener('click',()=>{showScreen('dashboardScreen');loadLeaderboard();window.location.hash='';});
 
-// ==================== INIT ====================
+// Init dengan auto-detect
 function initApp() {
   sampleQuizzes = window.IRMA_QUIZZES || [];
   if (!sampleQuizzes.length) { setTimeout(initApp,300); return; }

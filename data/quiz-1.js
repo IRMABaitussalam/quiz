@@ -2,6 +2,7 @@ window.IRMA_QUIZZES = window.IRMA_QUIZZES || [];
 window.IRMA_QUIZZES.push({
   id: 'q1',
   title: 'Fiqih Ibadah',
+  description: 'Kuis tentang rukun Islam, shalat, zakat, haji, dan puasa.',
   date: '2026-05-01',
   category: 'fiqih',
   questions: [
