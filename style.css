@@ -57,8 +57,23 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .app-header { display:flex; align-items:center; justify-content:space-between; background:var(--navbar-bg); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid var(--navbar-border); border-radius:24px; box-shadow:8px 8px 16px var(--shadow-color),-8px -8px 16px var(--highlight-color); padding:10px 20px; margin-bottom:24px; position:relative; z-index:10; }
 .header-left { display:flex; align-items:center; gap:10px; }
 .brand-title { font-weight:600; font-size:1.1rem; user-select:none; }
-.avatar-wrapper { cursor:pointer; position:relative; }
-.avatar { width:38px; height:38px; border-radius:50%; object-fit:cover; box-shadow:3px 3px 6px var(--shadow-color),-3px -3px 6px var(--highlight-color); display:block; }
+.avatar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;         /* samakan dengan ukuran avatar */
+  height: 38px;
+  cursor: pointer;
+  position: relative;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color);
+}
 
 /* Nav links */
 .nav-links { display:none; align-items:center; gap:10px; }
