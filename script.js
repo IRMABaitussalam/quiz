@@ -188,7 +188,7 @@ function renderSkeletonLeaderboard() {
   if (leaderboardEmpty) leaderboardEmpty.style.display = 'none';
   for (let i=0;i<5;i++) {
     const li = document.createElement('li');
-    li.innerHTML = '<div class="skeleton-leaderboard"></div>';
+    li.innerHTML = '<div class="skeleton-leaderboard" style="grid-column: 1 / -1; height: 1.2rem; margin: 4px 0;"></div>';
     leaderboardList.appendChild(li);
   }
 }
