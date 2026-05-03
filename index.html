@@ -11,6 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
+    /* ========== SELURUH CSS SAMA SEPERTI SEBELUMNYA ========== */
     :root {
       --bg: #e8edf2;
       --bg-inset: #e8edf2;
@@ -303,6 +304,7 @@
       display: block;
     }
 
+    /* Review detail */
     .review-item {
       background: var(--bg-inset);
       border-radius: 16px;
@@ -314,10 +316,12 @@
     .correct {
       color: #27ae60;
     }
+
     .wrong {
       color: #e74c3c;
     }
 
+    /* Footer */
     .app-footer {
       margin-top: auto;
       text-align: center;
@@ -426,6 +430,7 @@
       </div>
     </div>
 
+    <!-- FOOTER -->
     <footer class="app-footer">
       2014–<span id="currentYear"></span> IRMA Baitussalam
     </footer>
@@ -447,7 +452,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Data kuis dengan dukungan HTML
+    // ==================== DATA QUIZ ====================
     const sampleQuizzes = [
       {
         id: 'q1',
@@ -468,7 +473,7 @@
         date: '2026-04-28',
         category: 'aqidah',
         questions: [
-          { question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...', options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'], answer: 0, explanation: '<b>Al-Alim</b> artinya Maha Mengetahui. <br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).' },
+          { question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...', options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'], answer: 0, explanation: '<b>Al-Alim</b> artinya Maha Mengetahui.<br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).' },
           { question: 'Nabi yang menerima kitab <u>Zabur</u> adalah...', options: ['Musa', 'Isa', 'Daud', 'Muhammad'], answer: 2, explanation: 'Kitab Zabur diturunkan kepada <b>Nabi Daud AS</b>.' },
           { question: 'Jumlah malaikat yang wajib diketahui ada...', options: ['7', '10', '12', '25'], answer: 1, explanation: 'Ada <b>10</b> malaikat yang wajib diketahui.' }
         ]
@@ -491,7 +496,7 @@
     let currentQuestionIndex = 0;
     let userAnswers = [];
 
-    // DOM elements
+    // ==================== UI ELEMENTS ====================
     const mainNavbar = document.getElementById('mainNavbar');
     const profileTrigger = document.getElementById('profileTrigger');
     const profileDropdown = document.getElementById('profileDropdown');
@@ -653,7 +658,6 @@
         return doc.exists ? doc.data() : null;
       } catch (error) {
         console.warn('Firestore gagal, fallback ke localStorage:', error);
-        // fallback ke localStorage
         const local = getLocalAttempts();
         return local[currentUser.email]?.[quizId] || null;
       }
@@ -675,8 +679,6 @@
         console.warn('Gagal simpan ke Firestore, simpan lokal:', error);
         saveLocalAttempt(quizId, answers, score);
         addToLocalLeaderboard(score);
-        // Reload leaderboard dari lokal
-        loadLeaderboard();
       }
     }
 
@@ -697,7 +699,7 @@
         }
       } catch (error) {
         console.warn('Leaderboard Firestore gagal:', error);
-        throw error; // biar saveAttempt tangkap
+        throw error; // dilempar agar saveAttempt bisa fallback
       }
     }
 
@@ -721,7 +723,6 @@
         leaderboardList.innerHTML = html;
       } catch (error) {
         console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', error);
-        // fallback ke localStorage
         const local = getLocalLeaderboard();
         if (local.length === 0) {
           leaderboardList.innerHTML = '';
@@ -763,6 +764,7 @@
     }
 
     function renderQuestion() {
+      if (!currentQuiz) return;
       const q = currentQuiz.questions[currentQuestionIndex];
       quizTitle.textContent = currentQuiz.title;
       questionNumber.textContent = `Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
@@ -802,20 +804,41 @@
         renderQuestion();
       }
     });
+
+    // ========== PERBAIKAN PENTING: SUBMIT HANDLER DENGAN TRY-CATCH ==========
     submitBtn.addEventListener('click', async () => {
-      let score = 0;
-      currentQuiz.questions.forEach((q, i) => {
-        if (userAnswers[i] === q.answer) score++;
-      });
-      // Simpan (otomatis fallback jika Firestore gagal)
-      await saveAttempt(currentQuiz.id, [...userAnswers], score);
-      showReviewScreen(currentQuiz, userAnswers, score);
-      // Reload leaderboard setelah simpan
-      loadLeaderboard();
+      console.log('Submit diklik');
+      if (!currentQuiz) {
+        console.error('currentQuiz hilang');
+        return;
+      }
+      try {
+        // Hitung skor
+        let score = 0;
+        currentQuiz.questions.forEach((q, i) => {
+          if (userAnswers[i] === q.answer) score++;
+        });
+        console.log('Skor:', score);
+
+        // Simpan percobaan (Firestore atau fallback)
+        await saveAttempt(currentQuiz.id, [...userAnswers], score);
+        console.log('Percobaan tersimpan');
+
+        // Tampilkan review
+        showReviewScreen(currentQuiz, userAnswers, score);
+        console.log('Review ditampilkan');
+
+        // Reload leaderboard
+        loadLeaderboard();
+      } catch (error) {
+        console.error('Error saat menyelesaikan kuis:', error);
+        alert('Terjadi kesalahan saat menyimpan hasil. Silakan coba lagi.');
+      }
     });
 
     // ==================== REVIEW SCREEN ====================
     function showReviewScreen(quiz, answers, score) {
+      console.log('Menampilkan review untuk', quiz.title);
       currentQuiz = quiz;
       resultScore.textContent = `${score} / ${quiz.questions.length}`;
       let html = '';
@@ -834,6 +857,7 @@
       });
       reviewContainer.innerHTML = html;
       showScreen('resultScreen');
+      console.log('Layar result aktif');
     }
 
     backToHomeBtn.addEventListener('click', () => {
