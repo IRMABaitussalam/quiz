@@ -330,7 +330,8 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   overflow-y: auto;          /* scroll internal jika konten panjang */
   padding: 12px;             /* ruang ekstra untuk shadow */
   margin: -12px;             /* kompensasi padding agar shadow tidak terpotong */
-  padding-bottom: -6px;
+  margin-bottom: 10px;
+  padding-bottom: 0;
 }
 
 #quizScreen .neu-card {
