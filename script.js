@@ -98,7 +98,12 @@ document.addEventListener('click', () => {
   if (hamburgerBtn) hamburgerBtn.classList.remove('open');
 });
 
-function goHome() { showScreen('dashboardScreen'); window.location.hash = ''; hamburgerDropdown.style.display='none'; if(hamburgerBtn) hamburgerBtn.classList.remove('open'); }
+function goHome() { 
+  showScreen('dashboardScreen'); 
+  window.location.hash = ''; 
+  if(hamburgerDropdown) hamburgerDropdown.style.display='none'; 
+  if(hamburgerBtn) hamburgerBtn.classList.remove('open'); 
+}
 navHomeDesktop.addEventListener('click', goHome);
 navHomeMobile.addEventListener('click', goHome);
 
@@ -117,20 +122,38 @@ function navigateToQuiz(quiz) { window.location.hash = '#/' + slugify(quiz.title
 // Skeleton
 function renderSkeletonQuizzes() {
   quizContainer.innerHTML = '';
-  for (let i=0;i<6;i++) { const c=document.createElement('div'); c.className='quiz-card skeleton'; c.innerHTML='<div class="skeleton-title"></div><div class="skeleton-meta"></div><div class="skeleton-badges"></div>'; quizContainer.appendChild(c); }
+  for (let i=0;i<6;i++) { 
+    const c=document.createElement('div'); 
+    c.className='quiz-card skeleton'; 
+    c.innerHTML='<div class="skeleton-title"></div><div class="skeleton-meta"></div><div class="skeleton-badges"></div>'; 
+    quizContainer.appendChild(c); 
+  }
 }
 function renderSkeletonLeaderboard() {
-  leaderboardList.innerHTML = ''; leaderboardEmpty.style.display='none';
-  for (let i=0;i<5;i++) { const li=document.createElement('li'); li.innerHTML='<div class="skeleton-leaderboard"></div>'; leaderboardList.appendChild(li); }
+  leaderboardList.innerHTML = ''; 
+  leaderboardEmpty.style.display='none';
+  for (let i=0;i<5;i++) { 
+    const li=document.createElement('li'); 
+    li.innerHTML='<div class="skeleton-leaderboard"></div>'; 
+    leaderboardList.appendChild(li); 
+  }
 }
 
-// Quiz list dengan deskripsi
+// Quiz list dengan DESKRIPSI
 function renderQuizzes(quizzes) {
   quizContainer.innerHTML = '';
-  if (!quizzes.length) { quizContainer.innerHTML='<p class="empty-message">Belum ada kuis</p>'; return; }
+  if (!quizzes.length) { 
+    quizContainer.innerHTML='<p class="empty-message">Belum ada kuis</p>'; 
+    return; 
+  }
   quizzes.forEach(q => {
-    const card = document.createElement('div'); card.className='quiz-card';
-    card.innerHTML = `<h3>${q.title}</h3><div class="date"><i class="ti ti-calendar"></i> ${new Date(q.date).toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'})}</div><span class="badge">${q.questions.length} soal</span><span class="badge">${q.category}</span>`;
+    const card = document.createElement('div'); 
+    card.className='quiz-card';
+    let html = `<h3>${q.title}</h3>`;
+    html += `<div class="date"><i class="ti ti-calendar"></i> ${new Date(q.date).toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'})}</div>`;
+    html += `<span class="badge">${q.questions.length} soal</span><span class="badge">${q.category}</span>`;
+    if (q.description) html += `<p class="description">${q.description}</p>`;
+    card.innerHTML = html;
     card.addEventListener('click', () => navigateToQuiz(q));
     quizContainer.appendChild(card);
   });
@@ -152,42 +175,81 @@ searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 // Firestore + local fallback
 const ATTEMPTS_KEY='irmaQuizAttempts_local', LEADERBOARD_KEY='irmaQuizLeaderboard_local';
 function getLocalAttempts() { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}'); }
-function saveLocalAttempt(qid,ans,score) { const a=getLocalAttempts(); if(!a[currentUser.email]) a[currentUser.email]={}; a[currentUser.email][qid]={answers:ans,score,date:new Date().toISOString()}; localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(a)); }
+function saveLocalAttempt(qid,ans,score) { 
+  const a=getLocalAttempts(); 
+  if(!a[currentUser.email]) a[currentUser.email]={}; 
+  a[currentUser.email][qid]={answers:ans,score,date:new Date().toISOString()}; 
+  localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(a)); 
+}
 function getLocalLeaderboard() { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)||'[]'); }
 function safeNum(v) { const n=parseInt(v,10); return isNaN(n)?0:n; }
 function addToLocalLeaderboard(score) {
-  const lb=getLocalLeaderboard(); const ex=lb.find(e=>e.email===currentUser.email);
-  if(ex) ex.totalScore=safeNum(ex.totalScore)+score; else lb.push({email:currentUser.email,name:currentUser.displayName,totalScore:score});
+  const lb=getLocalLeaderboard(); 
+  const ex=lb.find(e=>e.email===currentUser.email);
+  if(ex) ex.totalScore=safeNum(ex.totalScore)+score; 
+  else lb.push({email:currentUser.email,name:currentUser.displayName,totalScore:score});
   localStorage.setItem(LEADERBOARD_KEY,JSON.stringify(lb));
 }
 
 async function getUserAttempt(qid) {
-  try { const d=await db.collection('attempts').doc(`${currentUser.uid}_${qid}`).get(); if(d.exists){const data=d.data();data.score=safeNum(data.score);return data;} return null; }
-  catch(e){ const l=getLocalAttempts(); const a=l[currentUser.email]?.[qid]; if(a)a.score=safeNum(a.score); return a||null; }
+  try { 
+    const d=await db.collection('attempts').doc(`${currentUser.uid}_${qid}`).get(); 
+    if(d.exists){const data=d.data();data.score=safeNum(data.score);return data;} 
+    return null; 
+  }
+  catch(e){ 
+    const l=getLocalAttempts(); 
+    const a=l[currentUser.email]?.[qid]; 
+    if(a)a.score=safeNum(a.score); 
+    return a||null; 
+  }
 }
 async function saveAttempt(qid,ans,score) {
-  try { await db.collection('attempts').doc(`${currentUser.uid}_${qid}`).set({uid:currentUser.uid,email:currentUser.email,quizId:qid,answers:ans,score,date:firebase.firestore.FieldValue.serverTimestamp()}); await addToLeaderboard(score); }
-  catch(e){ saveLocalAttempt(qid,ans,score); addToLocalLeaderboard(score); }
+  try { 
+    await db.collection('attempts').doc(`${currentUser.uid}_${qid}`).set({
+      uid:currentUser.uid,email:currentUser.email,quizId:qid,answers:ans,score,
+      date:firebase.firestore.FieldValue.serverTimestamp()
+    }); 
+    await addToLeaderboard(score); 
+  }
+  catch(e){ 
+    saveLocalAttempt(qid,ans,score); 
+    addToLocalLeaderboard(score); 
+  }
 }
 async function addToLeaderboard(score) {
-  try { const r=db.collection('leaderboard').doc(currentUser.uid); const d=await r.get(); if(d.exists) await r.update({totalScore:firebase.firestore.FieldValue.increment(score)}); else await r.set({uid:currentUser.uid,name:currentUser.displayName,totalScore:score}); }
+  try { 
+    const r=db.collection('leaderboard').doc(currentUser.uid); 
+    const d=await r.get(); 
+    if(d.exists) await r.update({totalScore:firebase.firestore.FieldValue.increment(score)}); 
+    else await r.set({uid:currentUser.uid,name:currentUser.displayName,totalScore:score}); 
+  }
   catch(e){ throw e; }
 }
 async function loadLeaderboard() {
   try {
-    const snap=await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get(); leaderboardList.innerHTML='';
-    if(snap.empty){leaderboardEmpty.style.display='block';return;} leaderboardEmpty.style.display='none';
+    const snap=await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get(); 
+    leaderboardList.innerHTML='';
+    if(snap.empty){ leaderboardEmpty.style.display='block'; return; } 
+    leaderboardEmpty.style.display='none';
     snap.forEach((d,i)=>{
-      const data=d.data(); const name = data.name || 'Tanpa Nama'; const score = safeNum(data.totalScore);
-      const li = document.createElement('li'); li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
+      const data=d.data(); 
+      const name = data.name || 'Tanpa Nama'; 
+      const score = safeNum(data.totalScore);
+      const li = document.createElement('li'); 
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
       leaderboardList.appendChild(li);
     });
   } catch(e){
-    const l=getLocalLeaderboard(); leaderboardList.innerHTML=''; if(!l.length){leaderboardEmpty.style.display='block';return;} leaderboardEmpty.style.display='none';
+    const l=getLocalLeaderboard(); 
+    leaderboardList.innerHTML=''; 
+    if(!l.length){ leaderboardEmpty.style.display='block'; return; } 
+    leaderboardEmpty.style.display='none';
     l.sort((a,b)=>safeNum(b.totalScore)-safeNum(a.totalScore));
     l.forEach((u,i)=>{
       const name = u.name || 'Tanpa Nama';
-      const li = document.createElement('li'); li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
+      const li = document.createElement('li'); 
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
       leaderboardList.appendChild(li);
     });
   }
@@ -199,6 +261,7 @@ async function handleQuizClick(quiz) {
   const att=await getUserAttempt(quiz.id);
   att ? showReviewScreen(quiz,att.answers,att.score) : startQuiz(quiz);
 }
+
 function startQuiz(quiz) {
   currentQuiz = quiz;
   currentQuestionIndex = 0;
@@ -207,7 +270,7 @@ function startQuiz(quiz) {
   renderQuestion();
 }
 
-// Handler sederhana
+// Aksi tombol prev / next
 function prevAction() {
   if (currentQuestionIndex === 0) {
     goHome();
@@ -224,46 +287,80 @@ function nextAction() {
 }
 
 function renderQuestion() {
-  if(!currentQuiz)return; const q=currentQuiz.questions[currentQuestionIndex];
-  quizTitle.textContent=currentQuiz.title; questionNumber.textContent=`Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
-  questionText.innerHTML=q.question; progressFill.style.width=((currentQuestionIndex+1)/currentQuiz.questions.length*100)+'%';
-  optionsContainer.innerHTML='';
-  q.options.forEach((opt,idx)=>{
-    const btn=document.createElement('button'); btn.className='quiz-option'; if(userAnswers[currentQuestionIndex]===idx) btn.classList.add('selected');
-    btn.innerHTML=opt; btn.addEventListener('click',()=>{userAnswers[currentQuestionIndex]=idx; renderQuestion();}); optionsContainer.appendChild(btn);
+  if (!currentQuiz) return;
+  const q = currentQuiz.questions[currentQuestionIndex];
+  quizTitle.textContent = currentQuiz.title;
+  questionNumber.textContent = `Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
+  questionText.innerHTML = q.question;
+  progressFill.style.width = ((currentQuestionIndex+1)/currentQuiz.questions.length*100)+'%';
+
+  optionsContainer.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    if (userAnswers[currentQuestionIndex] === idx) btn.classList.add('selected');
+    btn.innerHTML = opt;
+    btn.addEventListener('click', () => {
+      userAnswers[currentQuestionIndex] = idx;
+      renderQuestion();
+    });
+    optionsContainer.appendChild(btn);
   });
-  // navigasi
-  prevBtn.onclick = currentQuestionIndex === 0 ? goHome : prevHandler;
+
+  // Tombol navigasi (gunakan onclick langsung, hapus addEventListener)
+  prevBtn.onclick = prevAction;
   prevBtn.style.display = 'flex';
-  nextBtn.onclick = nextHandler;
-  nextBtn.style.display = (currentQuestionIndex === currentQuiz.questions.length - 1) ? 'none' : 'flex';
-  submitBtn.style.display = (currentQuestionIndex === currentQuiz.questions.length - 1) ? 'block' : 'none';
+  
+  if (currentQuestionIndex === currentQuiz.questions.length - 1) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'block';
+  } else {
+    nextBtn.onclick = nextAction;
+    nextBtn.style.display = 'flex';
+    submitBtn.style.display = 'none';
+  }
 }
-prevBtn.addEventListener('click', prevHandler); // sudah diassign ulang, tapi aman
-nextBtn.addEventListener('click', nextHandler);
+
 submitBtn.addEventListener('click', async () => {
-  if(!currentQuiz)return; let score=0;
-  currentQuiz.questions.forEach((q,i)=>{if(userAnswers[i]===q.answer)score++;});
-  await saveAttempt(currentQuiz.id,[...userAnswers],score);
-  showReviewScreen(currentQuiz,userAnswers,score); loadLeaderboard();
-});
-function showReviewScreen(quiz,answers,score) {
-  currentQuiz=quiz; resultScore.textContent=`${score} / ${quiz.questions.length}`; let html='';
-  quiz.questions.forEach((q,i)=>{
-    const ua=answers[i]; const ok=ua===q.answer;
-    html+=`<div class="review-item"><p><strong>Soal ${i+1}:</strong> ${q.question} ${ok?'<i class="ti ti-check correct"></i>':'<i class="ti ti-x wrong"></i>'}</p>
-    <p>Jawaban kamu: <span class="${ok?'correct':'wrong'}">${ua!=null?q.options[ua]:'Tidak dijawab'}</span></p>
-    ${ok?'':`<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>`}
-    <p style="font-style:italic;margin-top:6px;">📘 ${q.explanation}</p></div>`;
+  if (!currentQuiz) return;
+  let score = 0;
+  currentQuiz.questions.forEach((q, i) => {
+    if (userAnswers[i] === q.answer) score++;
   });
-  reviewContainer.innerHTML=html; showScreen('resultScreen');
+  await saveAttempt(currentQuiz.id, [...userAnswers], score);
+  showReviewScreen(currentQuiz, userAnswers, score);
+  loadLeaderboard();
+});
+
+function showReviewScreen(quiz, answers, score) {
+  currentQuiz = quiz;
+  resultScore.textContent = `${score} / ${quiz.questions.length}`;
+  let html = '';
+  quiz.questions.forEach((q, i) => {
+    const ua = answers[i];
+    const ok = ua === q.answer;
+    html += `<div class="review-item">
+      <p><strong>Soal ${i+1}:</strong> ${q.question} ${ok ? '<i class="ti ti-check correct"></i>' : '<i class="ti ti-x wrong"></i>'}</p>
+      <p>Jawaban kamu: <span class="${ok ? 'correct' : 'wrong'}">${ua != null ? q.options[ua] : 'Tidak dijawab'}</span></p>
+      ${!ok ? `<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>` : ''}
+      <p style="font-style:italic; margin-top:6px;">📘 ${q.explanation}</p>
+    </div>`;
+  });
+  reviewContainer.innerHTML = html;
+  showScreen('resultScreen');
 }
-backToHomeBtn.addEventListener('click', ()=>{ showScreen('dashboardScreen'); loadLeaderboard(); window.location.hash=''; });
+
+backToHomeBtn.addEventListener('click', () => {
+  showScreen('dashboardScreen');
+  loadLeaderboard();
+  window.location.hash = '';
+});
 
 // Init auto-detect
 function initApp() {
   sampleQuizzes = window.IRMA_QUIZZES || [];
-  if (!sampleQuizzes.length) { setTimeout(initApp,300); return; }
+  if (!sampleQuizzes.length) { setTimeout(initApp, 300); return; }
   if (currentUser) { loadQuizzes(); loadLeaderboard(); checkHash(); }
 }
-if (window.IRMA_QUIZZES?.length) initApp(); else window.addEventListener('quizzesLoaded', initApp);
+if (window.IRMA_QUIZZES?.length) initApp(); 
+else window.addEventListener('quizzesLoaded', initApp);
