@@ -49,6 +49,13 @@ const backToHomeBtn = $('backToHomeBtn');
 
 $('currentYear').textContent = new Date().getFullYear();
 
+// Sembunyikan semua screen utama, tampilkan loading
+['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(id => {
+  const el = $(id);
+  if (el) el.classList.remove('active');
+});
+$('loadingScreen').style.display = 'flex';
+
 // Layar
 function showScreen(id) {
   ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(s => $(s).classList.remove('active'));
@@ -63,6 +70,13 @@ googleLoginBtn.addEventListener('click', () => {
 logoutBtn.addEventListener('click', () => auth.signOut());
 
 auth.onAuthStateChanged(user => {
+  // Hapus loading screen
+  const loader = $('loadingScreen');
+  if (loader) {
+    loader.classList.add('fade-out');
+    setTimeout(() => { loader.style.display = 'none'; }, 300);
+  }
+
   if (user) {
     currentUser = { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL };
     profileName.textContent = user.displayName || 'Peserta';
