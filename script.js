@@ -309,11 +309,15 @@ function renderLeaderboardArray(arr) {
   }
   leaderboardEmpty.style.display = 'none';
   arr.forEach((item, i) => {
+    const rank = i + 1;
+    let rankDisplay = `<span class="rank-number">${rank}.</span>`;
+    if (rank === 1) rankDisplay = `<span class="rank-number">🥇</span>`;
+    else if (rank === 2) rankDisplay = `<span class="rank-number">🥈</span>`;                                                  +    else if (rank === 3) rankDisplay = `<span class="rank-number">🥉</span>`;
+
     const li = document.createElement('li');
     li.innerHTML = `
-      <span class="rank-number">${i + 1}.</span>
+      ${rankDisplay}
       <span class="rank-name-wrapper">
-        <i class="ti ti-medal"></i>
         <span class="rank-name">${item.name}</span>
       </span>
       <span class="rank-score"><strong>${item.score} poin</strong></span>
