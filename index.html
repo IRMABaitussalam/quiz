@@ -74,7 +74,7 @@
     .header-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       cursor: pointer;
       position: relative;
     }
@@ -87,15 +87,14 @@
       box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
     }
 
-    .user-name {
-      font-weight: 600;
+    .chevron {
+      font-size: 0.8rem;
       color: var(--text);
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
     }
 
     .icon-btn {
@@ -141,7 +140,7 @@
       right: 20px;
     }
 
-    .dropdown-menu button, .dropdown-menu a {
+    .dropdown-menu button {
       background: var(--btn-bg);
       border: none;
       border-radius: 20px;
@@ -304,7 +303,6 @@
       display: block;
     }
 
-    /* Review detail */
     .review-item {
       background: var(--bg-inset);
       border-radius: 16px;
@@ -316,12 +314,10 @@
     .correct {
       color: #27ae60;
     }
-
     .wrong {
       color: #e74c3c;
     }
 
-    /* Footer */
     .app-footer {
       margin-top: auto;
       text-align: center;
@@ -343,9 +339,8 @@
     <!-- HEADER -->
     <header id="mainNavbar" class="app-header" style="display: none;">
       <div class="header-left" id="profileTrigger">
-        <img id="navAvatar" class="avatar" src="" alt="avatar" style="display:none;">
-        <span id="navUserName" class="user-name"></span>
-        <i class="ti ti-chevron-down" style="font-size: 0.8rem;"></i>
+        <img id="navAvatar" class="avatar" src="" alt="Profil" style="display:none;">
+        <i class="ti ti-chevron-down chevron"></i>
       </div>
       <div class="header-right">
         <button id="hamburgerBtn" class="icon-btn"><i class="ti ti-menu-2"></i></button>
@@ -431,7 +426,6 @@
       </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="app-footer">
       2014–<span id="currentYear"></span> IRMA Baitussalam
     </footer>
@@ -453,7 +447,7 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ==================== DATA QUIZ (SUPPORT HTML DI SOAL & PENJELASAN) ====================
+    // Data kuis dengan dukungan HTML
     const sampleQuizzes = [
       {
         id: 'q1',
@@ -461,36 +455,11 @@
         date: '2026-05-01',
         category: 'fiqih',
         questions: [
-          {
-            question: 'Rukun Islam yang <b>pertama</b> adalah...',
-            options: ['Shalat', 'Puasa', '<i>Syahadat</i>', 'Zakat'],
-            answer: 2,
-            explanation: '<b>Syahadat</b> adalah pengakuan bahwa tiada Tuhan selain Allah dan Muhammad adalah utusan Allah.'
-          },
-          {
-            question: 'Shalat wajib sehari semalam berjumlah...',
-            options: ['3', '4', '5', '6'],
-            answer: 2,
-            explanation: 'Shalat wajib ada <u>5 waktu</u>: Subuh, Zuhur, Asar, Magrib, Isya.'
-          },
-          {
-            question: 'Zakat fitrah wajib dikeluarkan pada bulan...',
-            options: ['Muharram', 'Ramadhan', 'Syawal', 'Dzulhijjah'],
-            answer: 1,
-            explanation: 'Zakat fitrah dikeluarkan pada bulan <b>Ramadhan</b> sebelum shalat Idul Fitri.'
-          },
-          {
-            question: 'Haji merupakan rukun Islam ke...',
-            options: ['3', '4', '5', '6'],
-            answer: 2,
-            explanation: 'Haji adalah rukun Islam <b>kelima</b> bagi yang mampu.'
-          },
-          {
-            question: 'Puasa Ramadhan hukumnya...',
-            options: ['Sunnah', 'Wajib', 'Mubah', 'Makruh'],
-            answer: 1,
-            explanation: 'Puasa Ramadhan hukumnya <b>wajib</b> bagi setiap Muslim yang baligh dan mampu.'
-          }
+          { question: 'Rukun Islam yang <b>pertama</b> adalah...', options: ['Shalat', 'Puasa', '<i>Syahadat</i>', 'Zakat'], answer: 2, explanation: '<b>Syahadat</b> adalah pengakuan bahwa tiada Tuhan selain Allah dan Muhammad adalah utusan Allah.' },
+          { question: 'Shalat wajib sehari semalam berjumlah...', options: ['3', '4', '5', '6'], answer: 2, explanation: 'Shalat wajib ada <u>5 waktu</u>: Subuh, Zuhur, Asar, Magrib, Isya.' },
+          { question: 'Zakat fitrah wajib dikeluarkan pada bulan...', options: ['Muharram', 'Ramadhan', 'Syawal', 'Dzulhijjah'], answer: 1, explanation: 'Zakat fitrah dikeluarkan pada bulan <b>Ramadhan</b> sebelum shalat Idul Fitri.' },
+          { question: 'Haji merupakan rukun Islam ke...', options: ['3', '4', '5', '6'], answer: 2, explanation: 'Haji adalah rukun Islam <b>kelima</b> bagi yang mampu.' },
+          { question: 'Puasa Ramadhan hukumnya...', options: ['Sunnah', 'Wajib', 'Mubah', 'Makruh'], answer: 1, explanation: 'Puasa Ramadhan hukumnya <b>wajib</b> bagi setiap Muslim yang baligh dan mampu.' }
         ]
       },
       {
@@ -499,24 +468,9 @@
         date: '2026-04-28',
         category: 'aqidah',
         questions: [
-          {
-            question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...',
-            options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'],
-            answer: 0,
-            explanation: '<b>Al-Alim</b> artinya Maha Mengetahui. <br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).'
-          },
-          {
-            question: 'Nabi yang menerima kitab <u>Zabur</u> adalah...',
-            options: ['Musa', 'Isa', 'Daud', 'Muhammad'],
-            answer: 2,
-            explanation: 'Kitab Zabur diturunkan kepada <b>Nabi Daud AS</b>.'
-          },
-          {
-            question: 'Jumlah malaikat yang wajib diketahui ada...',
-            options: ['7', '10', '12', '25'],
-            answer: 1,
-            explanation: 'Ada <b>10</b> malaikat yang wajib diketahui: Jibril, Mikail, Israfil, Izrail, Munkar, Nakir, Raqib, Atid, Malik, Ridwan.'
-          }
+          { question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...', options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'], answer: 0, explanation: '<b>Al-Alim</b> artinya Maha Mengetahui. <br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).' },
+          { question: 'Nabi yang menerima kitab <u>Zabur</u> adalah...', options: ['Musa', 'Isa', 'Daud', 'Muhammad'], answer: 2, explanation: 'Kitab Zabur diturunkan kepada <b>Nabi Daud AS</b>.' },
+          { question: 'Jumlah malaikat yang wajib diketahui ada...', options: ['7', '10', '12', '25'], answer: 1, explanation: 'Ada <b>10</b> malaikat yang wajib diketahui.' }
         ]
       },
       {
@@ -525,18 +479,8 @@
         date: '2026-04-25',
         category: 'sejarah',
         questions: [
-          {
-            question: 'Perang Badar terjadi pada tahun ... Hijriyah',
-            options: ['1', '2', '3', '4'],
-            answer: 1,
-            explanation: 'Perang Badar terjadi pada <b>17 Ramadhan 2 H</b>.'
-          },
-          {
-            question: 'Khalifah pertama umat Islam adalah...',
-            options: ['Umar', '<b>Abu Bakar</b>', 'Utsman', 'Ali'],
-            answer: 1,
-            explanation: '<b>Abu Bakar Ash-Shiddiq</b> adalah khalifah pertama setelah wafatnya Rasulullah.'
-          }
+          { question: 'Perang Badar terjadi pada tahun ... Hijriyah', options: ['1', '2', '3', '4'], answer: 1, explanation: 'Perang Badar terjadi pada <b>17 Ramadhan 2 H</b>.' },
+          { question: 'Khalifah pertama umat Islam adalah...', options: ['Umar', '<b>Abu Bakar</b>', 'Utsman', 'Ali'], answer: 1, explanation: '<b>Abu Bakar Ash-Shiddiq</b> adalah khalifah pertama.' }
         ]
       }
     ];
@@ -547,14 +491,13 @@
     let currentQuestionIndex = 0;
     let userAnswers = [];
 
-    // ==================== UI ELEMENTS ====================
+    // DOM elements
     const mainNavbar = document.getElementById('mainNavbar');
     const profileTrigger = document.getElementById('profileTrigger');
     const profileDropdown = document.getElementById('profileDropdown');
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const hamburgerDropdown = document.getElementById('hamburgerDropdown');
     const navAvatar = document.getElementById('navAvatar');
-    const navUserName = document.getElementById('navUserName');
     const profileName = document.getElementById('profileName');
     const logoutDropdown = document.getElementById('logoutBtnFromDropdown');
     const toggleThemeBtn = document.getElementById('toggleTheme');
@@ -591,14 +534,13 @@
 
     // ==================== AUTH ====================
     googleLoginBtn.addEventListener('click', () => {
-      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert(e.message));
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('Login gagal: ' + e.message));
     });
     logoutDropdown.addEventListener('click', () => auth.signOut());
 
     auth.onAuthStateChanged(user => {
       if (user) {
         currentUser = { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL };
-        navUserName.textContent = user.displayName || 'Peserta';
         profileName.textContent = user.displayName || 'Peserta';
         if (user.photoURL) {
           navAvatar.src = user.photoURL;
@@ -637,11 +579,7 @@
     toggleThemeBtn.addEventListener('click', () => {
       document.body.classList.toggle('dark');
       const icon = toggleThemeBtn.querySelector('i');
-      if (document.body.classList.contains('dark')) {
-        icon.className = 'ti ti-sun';
-      } else {
-        icon.className = 'ti ti-moon';
-      }
+      icon.className = document.body.classList.contains('dark') ? 'ti ti-sun' : 'ti ti-moon';
     });
 
     // ==================== NAVIGATION ====================
@@ -679,38 +617,140 @@
     }
     searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-    // ==================== FIRESTORE: ATTEMPTS ====================
-    function getUserAttemptDocId(quizId) {
-      return `${currentUser.uid}_${quizId}`;
+    // ==================== FIRESTORE DENGAN FALLBACK LOCALSTORAGE ====================
+    const ATTEMPTS_KEY = 'irmaQuizAttempts_local';
+    const LEADERBOARD_KEY = 'irmaQuizLeaderboard_local';
+
+    function getLocalAttempts() {
+      const raw = localStorage.getItem(ATTEMPTS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }
+    function saveLocalAttempt(quizId, answers, score) {
+      const attempts = getLocalAttempts();
+      if (!attempts[currentUser.email]) attempts[currentUser.email] = {};
+      attempts[currentUser.email][quizId] = { answers, score, date: new Date().toISOString() };
+      localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attempts));
+    }
+    function getLocalLeaderboard() {
+      const raw = localStorage.getItem(LEADERBOARD_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }
+    function addToLocalLeaderboard(score) {
+      const leaderboard = getLocalLeaderboard();
+      const existing = leaderboard.find(e => e.email === currentUser.email);
+      if (existing) {
+        existing.totalScore += score;
+      } else {
+        leaderboard.push({ email: currentUser.email, name: currentUser.displayName, totalScore: score });
+      }
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
     }
 
     async function getUserAttempt(quizId) {
-      const docRef = db.collection('attempts').doc(getUserAttemptDocId(quizId));
-      const doc = await docRef.get();
-      return doc.exists ? doc.data() : null;
+      try {
+        const docRef = db.collection('attempts').doc(`${currentUser.uid}_${quizId}`);
+        const doc = await docRef.get();
+        return doc.exists ? doc.data() : null;
+      } catch (error) {
+        console.warn('Firestore gagal, fallback ke localStorage:', error);
+        // fallback ke localStorage
+        const local = getLocalAttempts();
+        return local[currentUser.email]?.[quizId] || null;
+      }
     }
 
     async function saveAttempt(quizId, answers, score) {
-      const docRef = db.collection('attempts').doc(getUserAttemptDocId(quizId));
-      await docRef.set({
-        uid: currentUser.uid,
-        email: currentUser.email,
-        quizId,
-        answers,
-        score,
-        date: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      // update leaderboard
-      await addToLeaderboard(score);
+      try {
+        const docRef = db.collection('attempts').doc(`${currentUser.uid}_${quizId}`);
+        await docRef.set({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          quizId,
+          answers,
+          score,
+          date: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await addToLeaderboard(score);
+      } catch (error) {
+        console.warn('Gagal simpan ke Firestore, simpan lokal:', error);
+        saveLocalAttempt(quizId, answers, score);
+        addToLocalLeaderboard(score);
+        // Reload leaderboard dari lokal
+        loadLeaderboard();
+      }
     }
 
+    async function addToLeaderboard(score) {
+      try {
+        const leaderDocRef = db.collection('leaderboard').doc(currentUser.uid);
+        const doc = await leaderDocRef.get();
+        if (doc.exists) {
+          await leaderDocRef.update({
+            totalScore: firebase.firestore.FieldValue.increment(score)
+          });
+        } else {
+          await leaderDocRef.set({
+            uid: currentUser.uid,
+            name: currentUser.displayName,
+            totalScore: score
+          });
+        }
+      } catch (error) {
+        console.warn('Leaderboard Firestore gagal:', error);
+        throw error; // biar saveAttempt tangkap
+      }
+    }
+
+    async function loadLeaderboard() {
+      try {
+        const snapshot = await db.collection('leaderboard')
+          .orderBy('totalScore', 'desc')
+          .limit(20)
+          .get();
+        if (snapshot.empty) {
+          leaderboardList.innerHTML = '';
+          leaderboardEmpty.style.display = 'block';
+          return;
+        }
+        leaderboardEmpty.style.display = 'none';
+        let html = '';
+        snapshot.forEach((doc, i) => {
+          const data = doc.data();
+          html += `<li><span><i class="ti ti-medal"></i> ${i+1}. ${data.name}</span> <strong>${data.totalScore} poin</strong></li>`;
+        });
+        leaderboardList.innerHTML = html;
+      } catch (error) {
+        console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', error);
+        // fallback ke localStorage
+        const local = getLocalLeaderboard();
+        if (local.length === 0) {
+          leaderboardList.innerHTML = '';
+          leaderboardEmpty.style.display = 'block';
+          return;
+        }
+        leaderboardEmpty.style.display = 'none';
+        local.sort((a,b) => b.totalScore - a.totalScore);
+        let html = '';
+        local.forEach((u, i) => {
+          html += `<li><span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${u.totalScore} poin</strong></li>`;
+        });
+        leaderboardList.innerHTML = html;
+      }
+    }
+
+    // ==================== HANDLE QUIZ CLICK ====================
     async function handleQuizClick(quiz) {
       if (!currentUser) return;
-      const attempt = await getUserAttempt(quiz.id);
-      if (attempt) {
-        showReviewScreen(quiz, attempt.answers, attempt.score);
-      } else {
-        startQuiz(quiz);
+      try {
+        const attempt = await getUserAttempt(quiz.id);
+        if (attempt) {
+          showReviewScreen(quiz, attempt.answers, attempt.score);
+        } else {
+          startQuiz(quiz);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan memeriksa kuis. Silakan coba lagi.');
+        console.error(err);
       }
     }
 
@@ -726,14 +766,14 @@
       const q = currentQuiz.questions[currentQuestionIndex];
       quizTitle.textContent = currentQuiz.title;
       questionNumber.textContent = `Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
-      questionText.innerHTML = q.question; // HTML support
+      questionText.innerHTML = q.question;
       progressFill.style.width = ((currentQuestionIndex+1)/currentQuiz.questions.length*100)+'%';
       optionsContainer.innerHTML = '';
       q.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
         if (userAnswers[currentQuestionIndex] === idx) btn.classList.add('selected');
-        btn.innerHTML = opt; // HTML support
+        btn.innerHTML = opt;
         btn.addEventListener('click', () => {
           userAnswers[currentQuestionIndex] = idx;
           renderQuestion();
@@ -762,63 +802,17 @@
         renderQuestion();
       }
     });
-    submitBtn.addEventListener('click', finishQuiz);
-
-    async function finishQuiz() {
+    submitBtn.addEventListener('click', async () => {
       let score = 0;
       currentQuiz.questions.forEach((q, i) => {
         if (userAnswers[i] === q.answer) score++;
       });
+      // Simpan (otomatis fallback jika Firestore gagal)
       await saveAttempt(currentQuiz.id, [...userAnswers], score);
       showReviewScreen(currentQuiz, userAnswers, score);
-    }
-
-    // ==================== FIRESTORE: LEADERBOARD ====================
-    async function addToLeaderboard(score) {
-      const leaderDocRef = db.collection('leaderboard').doc(currentUser.uid);
-      const doc = await leaderDocRef.get();
-      if (doc.exists) {
-        await leaderDocRef.update({
-          totalScore: firebase.firestore.FieldValue.increment(score)
-        });
-      } else {
-        await leaderDocRef.set({
-          uid: currentUser.uid,
-          name: currentUser.displayName,
-          totalScore: score
-        });
-      }
-    }
-
-    async function loadLeaderboard() {
-      try {
-        const snapshot = await db.collection('leaderboard')
-          .orderBy('totalScore', 'desc')
-          .limit(20)
-          .get();
-        if (snapshot.empty) {
-          leaderboardList.innerHTML = '';
-          leaderboardEmpty.style.display = 'block';
-          return;
-        }
-        leaderboardEmpty.style.display = 'none';
-        let html = '';
-        snapshot.forEach((doc, index) => {
-          const data = doc.data();
-          html += `
-            <li>
-              <span><i class="ti ti-medal"></i> ${index+1}. ${data.name}</span>
-              <strong>${data.totalScore} poin</strong>
-            </li>
-          `;
-        });
-        leaderboardList.innerHTML = html;
-      } catch (error) {
-        console.error('Error memuat leaderboard:', error);
-        leaderboardList.innerHTML = '<li class="empty-message">Gagal memuat ranking.</li>';
-        leaderboardEmpty.style.display = 'none';
-      }
-    }
+      // Reload leaderboard setelah simpan
+      loadLeaderboard();
+    });
 
     // ==================== REVIEW SCREEN ====================
     function showReviewScreen(quiz, answers, score) {
