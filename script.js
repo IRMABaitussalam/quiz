@@ -310,7 +310,11 @@ function renderLeaderboardArray(arr) {
   leaderboardEmpty.style.display = 'none';
   arr.forEach((item, i) => {
     const li = document.createElement('li');
-    li.innerHTML = `<span><i class="ti ti-medal"></i> ${i + 1}. ${item.name}</span> <strong>${item.score} poin</strong>`;
+    li.innerHTML = `
+      <span class="rank-number">${i + 1}.</span>
+      <span class="rank-name"><i class="ti ti-medal"></i> ${item.name}</span>
+      <span class="rank-score"><strong>${item.score} poin</strong></span>
+    `;
     leaderboardList.appendChild(li);
   });
 }
