@@ -84,7 +84,17 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .dropdown-menu button, .dropdown-menu a {
   background:var(--surface1); width:100%; justify-content:flex-start;
 }
-.dropdown-menu .theme-toggle-btn { align-self:center; width:40px; height:40px; border-radius:50%; padding:0; }
+.dropdown-menu .theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0 !important;
+  align-self: center;
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+}
 
 /* Search */
 .search-wrapper { position:relative; margin-bottom:24px; }
