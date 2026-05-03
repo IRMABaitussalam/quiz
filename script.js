@@ -12,14 +12,12 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// State
 let currentUser = null;
 let currentQuiz = null;
 let currentQuestionIndex = 0;
 let userAnswers = [];
 let sampleQuizzes = [];
 
-// DOM
 const $ = (id) => document.getElementById(id);
 const mainNavbar = $('mainNavbar');
 const profileTrigger = $('profileTrigger');
@@ -151,7 +149,7 @@ function loadQuizzes(filter='') {
 }
 searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-// Firestore + local fallback dengan perbaikan NaN
+// Firestore + local fallback
 const ATTEMPTS_KEY='irmaQuizAttempts_local', LEADERBOARD_KEY='irmaQuizLeaderboard_local';
 function getLocalAttempts() { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||'{}'); }
 function saveLocalAttempt(qid,ans,score) { const a=getLocalAttempts(); if(!a[currentUser.email]) a[currentUser.email]={}; a[currentUser.email][qid]={answers:ans,score,date:new Date().toISOString()}; localStorage.setItem(ATTEMPTS_KEY,JSON.stringify(a)); }
@@ -180,11 +178,8 @@ async function loadLeaderboard() {
     const snap=await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get(); leaderboardList.innerHTML='';
     if(snap.empty){leaderboardEmpty.style.display='block';return;} leaderboardEmpty.style.display='none';
     snap.forEach((d,i)=>{
-      const data=d.data();
-      const name = data.name || 'Tanpa Nama';
-      const score = safeNum(data.totalScore);
-      const li = document.createElement('li');
-      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
+      const data=d.data(); const name = data.name || 'Tanpa Nama'; const score = safeNum(data.totalScore);
+      const li = document.createElement('li'); li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
       leaderboardList.appendChild(li);
     });
   } catch(e){
@@ -192,8 +187,7 @@ async function loadLeaderboard() {
     l.sort((a,b)=>safeNum(b.totalScore)-safeNum(a.totalScore));
     l.forEach((u,i)=>{
       const name = u.name || 'Tanpa Nama';
-      const li = document.createElement('li');
-      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
+      const li = document.createElement('li'); li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
       leaderboardList.appendChild(li);
     });
   }
@@ -206,6 +200,17 @@ async function handleQuizClick(quiz) {
   att ? showReviewScreen(quiz,att.answers,att.score) : startQuiz(quiz);
 }
 function startQuiz(quiz) { currentQuiz=quiz; currentQuestionIndex=0; userAnswers=new Array(quiz.questions.length).fill(null); showScreen('quizScreen'); renderQuestion(); }
+
+// Handler tombol navigasi
+function prevHandler() {
+  if (currentQuestionIndex === 0) { goHome(); return; } // kembali ke beranda di soal pertama
+  if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestion(); }
+}
+function nextHandler() {
+  if (!currentQuiz) return;
+  if (currentQuestionIndex < currentQuiz.questions.length - 1) { currentQuestionIndex++; renderQuestion(); }
+}
+
 function renderQuestion() {
   if(!currentQuiz)return; const q=currentQuiz.questions[currentQuestionIndex];
   quizTitle.textContent=currentQuiz.title; questionNumber.textContent=`Soal ${currentQuestionIndex+1} dari ${currentQuiz.questions.length}`;
@@ -215,13 +220,16 @@ function renderQuestion() {
     const btn=document.createElement('button'); btn.className='quiz-option'; if(userAnswers[currentQuestionIndex]===idx) btn.classList.add('selected');
     btn.innerHTML=opt; btn.addEventListener('click',()=>{userAnswers[currentQuestionIndex]=idx; renderQuestion();}); optionsContainer.appendChild(btn);
   });
-  prevBtn.style.display=currentQuestionIndex===0?'none':'inline-flex';
-  if(currentQuestionIndex===currentQuiz.questions.length-1){nextBtn.style.display='none';submitBtn.style.display='block';}
-  else{nextBtn.style.display='inline-flex';submitBtn.style.display='none';}
+  // navigasi
+  prevBtn.onclick = currentQuestionIndex === 0 ? goHome : prevHandler;
+  prevBtn.style.display = 'flex';
+  nextBtn.onclick = nextHandler;
+  nextBtn.style.display = (currentQuestionIndex === currentQuiz.questions.length - 1) ? 'none' : 'flex';
+  submitBtn.style.display = (currentQuestionIndex === currentQuiz.questions.length - 1) ? 'block' : 'none';
 }
-prevBtn.addEventListener('click',()=>{if(currentQuestionIndex>0){currentQuestionIndex--;renderQuestion();}});
-nextBtn.addEventListener('click',()=>{if(currentQuestionIndex<currentQuiz.questions.length-1){currentQuestionIndex++;renderQuestion();}});
-submitBtn.addEventListener('click',async()=>{
+prevBtn.addEventListener('click', prevHandler); // sudah diassign ulang, tapi aman
+nextBtn.addEventListener('click', nextHandler);
+submitBtn.addEventListener('click', async () => {
   if(!currentQuiz)return; let score=0;
   currentQuiz.questions.forEach((q,i)=>{if(userAnswers[i]===q.answer)score++;});
   await saveAttempt(currentQuiz.id,[...userAnswers],score);
@@ -238,9 +246,9 @@ function showReviewScreen(quiz,answers,score) {
   });
   reviewContainer.innerHTML=html; showScreen('resultScreen');
 }
-backToHomeBtn.addEventListener('click',()=>{showScreen('dashboardScreen');loadLeaderboard();window.location.hash='';});
+backToHomeBtn.addEventListener('click', ()=>{ showScreen('dashboardScreen'); loadLeaderboard(); window.location.hash=''; });
 
-// Init dengan auto-detect
+// Init auto-detect
 function initApp() {
   sampleQuizzes = window.IRMA_QUIZZES || [];
   if (!sampleQuizzes.length) { setTimeout(initApp,300); return; }
