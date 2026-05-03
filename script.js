@@ -312,7 +312,8 @@ function renderLeaderboardArray(arr) {
     const rank = i + 1;
     let rankDisplay = `<span class="rank-number">${rank}.</span>`;
     if (rank === 1) rankDisplay = `<span class="rank-number">🥇</span>`;
-    else if (rank === 2) rankDisplay = `<span class="rank-number">🥈</span>`;                                                  +    else if (rank === 3) rankDisplay = `<span class="rank-number">🥉</span>`;
+    else if (rank === 2) rankDisplay = `<span class="rank-number">🥈</span>`;
+    else if (rank === 3) rankDisplay = `<span class="rank-number">🥉</span>`;
 
     const li = document.createElement('li');
     li.innerHTML = `
