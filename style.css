@@ -9,8 +9,7 @@
   --surface2: #acb0be; --surface1: #bcc0cc; --surface0: #ccd0da;
   --base: #e6e9ef; --mantle: #e6e9ef; --crust: #dce0e8;
   --shadow-color: #b8babd; --highlight-color: #ffffff;
-  --navbar-bg-color: rgba(230, 233, 239, 0.5);
-  --navbar-border-color: rgba(213, 217, 225, 0.6);
+  --navbar-bg-color: rgba(230, 233, 239, 0.5); --navbar-border-color: rgba(213, 217, 225, 0.6);
   --icon-color: var(--overlay2);
 }
 
@@ -24,14 +23,13 @@
   --surface2: #585b70; --surface1: #45475a; --surface0: #313244;
   --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
   --shadow-color: #101017; --highlight-color: #2b2b41;
-  --navbar-bg-color: rgba(24, 24, 37, 0.5);
-  --navbar-border-color: rgba(40, 40, 62, 0.6);
+  --navbar-bg-color: rgba(24, 24, 37, 0.5); --navbar-border-color: rgba(40, 40, 62, 0.6);
   --icon-color: var(--overlay2);
 }
 
 /* ===== GLOBAL ===== */
 * { margin:0; padding:0; box-sizing:border-box; transition: background 0.3s, box-shadow 0.3s, color 0.3s; }
-body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: var(--text); min-height: 100vh; }
+body { background: var(--base); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); min-height: 100vh; }
 .app-wrapper { max-width: 1100px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
 
 /* ===== HEADER / NAVBAR ===== */
@@ -40,9 +38,9 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
   background: var(--navbar-bg-color); backdrop-filter: blur(10px);
   border: 1px solid var(--navbar-border-color); border-radius: 24px;
   box-shadow: 8px 8px 16px var(--shadow-color), -8px -8px 16px var(--highlight-color);
-  padding: 10px 20px; margin-bottom: 24px; position: relative; z-index: 10; flex-wrap: wrap;
+  padding: 10px 20px; margin-bottom: 24px; position: relative; z-index: 10;
 }
-.header-left { display: flex; align-items: center; gap: 10px; position: relative; z-index: 2; }
+.header-left { display: flex; align-items: center; gap: 10px; }
 .brand-title { font-weight: 600; font-size: 1.1rem; color: var(--text); }
 .avatar-wrapper { cursor: pointer; position: relative; }
 .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color); }
@@ -57,14 +55,15 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
 }
 .nav-btn:active { box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color); }
 
-/* Tombol tema bulat sempurna */
+/* Tombol tema */
 .theme-toggle-btn {
   background: var(--surface0); border: none; border-radius: 50%; width: 40px; height: 40px;
   box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
-  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: var(--icon-color);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem;
+  color: var(--icon-color);
 }
 
-/* Hamburger mobile */
+/* Hamburger */
 .hamburger-btn {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
   background: var(--surface0); border: none; border-radius: 50%; width: 40px; height: 40px;
@@ -82,6 +81,7 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
   padding: 12px; display: none; flex-direction: column; gap: 8px; z-index: 20; min-width: 180px;
 }
 .profile-dropdown { left: 0; right: auto; }
+.hamburger-dropdown { right: 20px; }
 .dropdown-menu button, .dropdown-menu a {
   background: var(--surface1); border: none; border-radius: 20px; padding: 10px 16px;
   box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color);
@@ -89,7 +89,13 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
   display: flex; align-items: center; gap: 8px; width: 100%; text-decoration: none;
 }
 
-/* Search */
+/* Tombol tema didalam dropdown mobile (harus bulat) */
+.dropdown-menu .theme-toggle-btn {
+  border-radius: 50%; width: 40px; height: 40px; padding: 0; align-self: center;
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+}
+
+/* ===== SEARCH ===== */
 .search-wrapper { position: relative; margin-bottom: 24px; }
 .search-wrapper input {
   width: 100%; padding: 14px 20px 14px 48px; border: none; border-radius: 30px;
@@ -98,7 +104,7 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
 }
 .search-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--icon-color); font-size: 1.1rem; }
 
-/* Komponen neumorphic */
+/* ===== COMPONENTS ===== */
 .neu-card { background: var(--surface0); border-radius: 24px; box-shadow: 8px 8px 16px var(--shadow-color), -8px -8px 16px var(--highlight-color); padding: 24px; margin-bottom: 20px; }
 .section-title { font-size: 1.4rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text); }
 .section-title i { color: var(--icon-color); }
@@ -110,19 +116,44 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
 .leaderboard-list { list-style: none; margin-top: 8px; }
 .leaderboard-list li { display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px; margin-bottom: 8px; background: var(--surface0); box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color); color: var(--text); }
 .empty-message { text-align: center; color: var(--subtext1); padding: 20px; font-style: italic; }
+
+/* ===== QUIZ & BUTTONS ===== */
 .quiz-option { display: block; width: 100%; text-align: left; margin: 10px 0; padding: 14px 20px; background: var(--surface1); border: none; border-radius: 20px; box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color); color: var(--text); font-size: 1rem; cursor: pointer; }
 .quiz-option.selected { box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color); font-weight: 700; }
 .progress-bar { height: 8px; background: var(--surface1); border-radius: 8px; margin: 16px 0; box-shadow: inset 2px 2px 5px var(--shadow-color), inset -2px -2px 5px var(--highlight-color); }
 .progress-fill { height: 100%; background: var(--blue); border-radius: 8px; width: 0%; }
-.screen { display: none; flex: 1; }
-.screen.active { display: block; }
-.review-item { background: var(--surface1); border-radius: 16px; padding: 16px; margin-bottom: 15px; box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color); }
-.correct { color: var(--green); }
-.wrong { color: var(--red); }
-.app-footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.85rem; color: var(--subtext1); border-top: 1px solid var(--overlay0); }
-.icon-btn i { color: var(--icon-color); }
+.icon-btn {
+  background: var(--surface0); border: none; border-radius: 50%; width: 40px; height: 40px;
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem;
+  color: var(--icon-color);
+}
+.quiz-nav-btn {
+  width: auto; height: auto; padding: 10px 20px; border-radius: 30px;
+  background: var(--surface0); color: var(--text); box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+}
+.submit-quiz-btn {
+  width: 100%; margin-top: 12px; padding: 14px 24px; border-radius: 30px;
+  background: var(--surface0); color: var(--text); box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+}
+.back-home-btn {
+  width: auto; margin: 20px auto 0; padding: 12px 24px; border-radius: 30px;
+  background: var(--surface0); color: var(--text); box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+}
 
-/* Skeleton */
+/* ===== LOGIN CENTERING ===== */
+.login-card { max-width: 400px; margin: 60px auto; text-align: center; }
+.login-btn-wrapper { display: flex; justify-content: center; margin-top: 20px; }
+.login-footer-text { font-size: 0.75rem; color: var(--subtext1); margin-top: 20px; }
+
+/* ===== REVIEW ===== */
+.review-item { background: var(--surface1); border-radius: 16px; padding: 16px; margin-bottom: 15px; box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color); }
+.correct { color: var(--green); } .wrong { color: var(--red); }
+
+/* ===== FOOTER ===== */
+.app-footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.85rem; color: var(--subtext1); border-top: 1px solid var(--overlay0); }
+
+/* ===== SKELETON ===== */
 .skeleton .skeleton-title, .skeleton .skeleton-meta, .skeleton .skeleton-badges {
   background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%);
   background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px;
@@ -133,17 +164,13 @@ body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-syste
 .skeleton-leaderboard { height: 1rem; width: 100%; background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; margin-bottom: 8px; }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-/* Responsif */
+/* ===== RESPONSIVE ===== */
 @media (min-width: 768px) {
   .nav-links { display: flex; }
   .hamburger-btn { display: none; }
-  .dropdown-menu { display: none !important; }
+  .hamburger-dropdown { display: none !important; } /* hanya sembunyikan hamburger, profil tetap aktif */
 }
 @media (max-width: 767px) {
   .quiz-grid { grid-template-columns: 1fr; }
   .brand-title { font-size: 0.9rem; }
-  /* Pastikan tombol tema di dropdown mobile bulat sempurna */
-  .dropdown-menu .theme-toggle-btn {
-    align-self: center;
-  }
 }
