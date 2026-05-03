@@ -287,7 +287,7 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .back-home-btn {
   width: auto;
   height: auto;
-  margin: 16px auto 0;   /* atas 24px, kiri/kanan auto */
+  margin: 12px auto 0;   /* atas 24px, kiri/kanan auto */
   padding: 12px 24px;
   border-radius: 30px;
   color: var(--text);
@@ -331,7 +331,7 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   padding: 12px;             /* ruang ekstra untuk shadow */
   margin: -12px;             /* kompensasi padding agar shadow tidak terpotong */
   margin-bottom: 12px;
-  padding-bottom: 0;
+  padding-bottom: -2px;
 }
 
 #quizScreen .neu-card {
