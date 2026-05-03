@@ -65,9 +65,20 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 
 /* Hamburger */
 .hamburger-btn {
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
-  background:var(--surface0); border:none; border-radius:50%; width:40px; height:40px;
-  box-shadow:4px 4px 8px var(--shadow-color),-4px -4px 8px var(--highlight-color); cursor:pointer; transition:all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: var(--surface0);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;                   /* pastikan tidak ada padding tambahan */
 }
 .hamburger-btn:hover { box-shadow:6px 6px 12px var(--shadow-color),-6px -6px 12px var(--highlight-color); }
 .hamburger-line {
@@ -75,9 +86,10 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   width: 20px;
   height: 2px;
   background: var(--icon-color);
-  border-radius: 0;          /* <- ubah ke 0 agar ujung tidak bulat */
+  border-radius: 1px;           /* sedikit radius membantu anti-aliasing */
   transition: transform 0.3s, opacity 0.2s;
-  transform-origin: center;  /* opsional, memastikan rotasi dari tengah */
+  transform-origin: center;
+  will-change: transform, opacity;  /* optimasi rendering */
 }
 .hamburger-btn.open .hamburger-line:nth-child(1) { transform:translateY(7px) rotate(45deg); }
 .hamburger-btn.open .hamburger-line:nth-child(2) { opacity:0; }
