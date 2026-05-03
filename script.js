@@ -334,18 +334,29 @@ async function addToLeaderboard(score) {
 async function loadLeaderboard() {
   if (!leaderboardList) return;
   try {
-    const snapshot = await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get();
+    const snapshot = await db.collection('leaderboard')
+      .orderBy('totalScore', 'desc')
+      .limit(20)
+      .get();
     const leaderboardArray = [];
     snapshot.forEach(doc => {
       const data = doc.data();
-      leaderboardArray.push({ uid: doc.id, name: cleanName(data.name), score: safeNum(data.totalScore) });
+      leaderboardArray.push({
+        uid: doc.id,
+        name: cleanName(data.name),
+        score: safeNum(data.totalScore)
+      });
     });
-    renderLeaderboardArray(leaderboardArray);
+    renderLeaderboardArray(leaderboardArray); // langsung render, skeleton diganti di sini
   } catch (e) {
-    console.warn('Fallback leaderboard lokal');
+    console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', e);
     const local = getLocalLeaderboard();
-    const cleaned = local.map(u => ({ uid: u.uid || u.email, name: cleanName(u.name), score: safeNum(u.totalScore) }));
-    cleaned.sort((a,b) => b.score - a.score);
+    const cleaned = local.map(u => ({
+      uid: u.uid || u.email,
+      name: cleanName(u.name),
+      score: safeNum(u.totalScore)
+    }));
+    cleaned.sort((a, b) => b.score - a.score);
     renderLeaderboardArray(cleaned);
   }
 }

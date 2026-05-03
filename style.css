@@ -233,6 +233,27 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color);
   transform: scale(0.95);
 }
+.quiz-nav-btn-text {
+  width: auto;
+  height: auto;
+  padding: 10px 18px;
+  border-radius: 30px;
+  color: var(--text);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface0);
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.quiz-nav-btn-text:hover {
+  box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color);
+  transform: scale(0.97);
+}
 .quiz-navigation {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 20px; width: 100%;
