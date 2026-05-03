@@ -6,126 +6,16 @@
   <title>IRMA Baitussalam · Kuis & Ranking</title>
   <!-- Tabler Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <!-- CSS Utama -->
+  <link rel="stylesheet" href="style.css">
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <style>
-    /* ========== TEMA CATPPUCCIN & NEUMORPHISM ========== */
-    :root[data-theme="light"] {
-      --rosewater: #dc8a78; --flamingo: #dd7878; --pink: #ea76cb; --mauve: #8839ef; --red: #d20f39;
-      --maroon: #e64553; --peach: #fe640b; --yellow: #df8e1d; --green: #40a02b; --teal: #179299;
-      --sky: #04a5e5; --sapphire: #209fb5; --blue: #1e66f5; --lavender: #7287fd;
-      --text: #4c4f69; --text1: #37394C; --subtext1: #5c5f77; --subtext0: #6c6f85;
-      --overlay2: #7c7f93; --overlay1: #8c8fa1; --overlay0: #9ca0b0; --surface2: #acb0be;
-      --surface1: #bcc0cc; --surface0: #ccd0da; --base: #e6e9ef; --mantle: #e6e9ef; --crust: #dce0e8;
-      --shadow-color: #b8babd; --highlight-color: #ffffff;
-      --navbar-bg-color: rgba(230, 233, 239, 0.5); --navbar-border-color: rgba(213, 217, 225, 0.6);
-      --icon-color: var(--overlay2);
-    }
-    :root[data-theme="dark"] {
-      --rosewater: #f5e0dc; --flamingo: #f2cdcd; --pink: #f5c2e7; --mauve: #cba6f7; --red: #f38ba8;
-      --maroon: #eba0ac; --peach: #fab387; --yellow: #f9e2af; --green: #a6e3a1; --teal: #94e2d5;
-      --sky: #89dceb; --sapphire: #74c7ec; --blue: #89b4fa; --lavender: #b4befe;
-      --text: #cdd6f4; --text1: #DEE3F4; --subtext1: #bac2de; --subtext0: #a6adc8;
-      --overlay2: #9399b2; --overlay1: #7f849c; --overlay0: #6c7086; --surface2: #585b70;
-      --surface1: #45475a; --surface0: #313244; --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
-      --shadow-color: #101017; --highlight-color: #2b2b41;
-      --navbar-bg-color: rgba(24, 24, 37, 0.5); --navbar-border-color: rgba(40, 40, 62, 0.6);
-      --icon-color: var(--overlay2);
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; transition: background 0.3s, box-shadow 0.3s, color 0.3s; }
-    body { background: var(--base); font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: var(--text); min-height: 100vh; }
-    .app-wrapper { max-width: 1100px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
-
-    /* ---------- HEADER ---------- */
-    .app-header {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--navbar-bg-color); backdrop-filter: blur(10px);
-      border: 1px solid var(--navbar-border-color); border-radius: 24px;
-      box-shadow: 8px 8px 16px var(--shadow-color), -8px -8px 16px var(--highlight-color);
-      padding: 10px 20px; margin-bottom: 24px; position: relative; z-index: 10;
-    }
-    .header-left { display: flex; align-items: center; gap: 10px; position: relative; z-index: 2; }
-    .brand-title { font-weight: 600; font-size: 1.1rem; color: var(--text); }
-    .avatar-wrapper { cursor: pointer; position: relative; }
-    .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color); }
-
-    .nav-links { display: none; align-items: center; gap: 8px; }
-    .nav-btn, .nav-link-btn {
-      background: var(--surface0); border: none; border-radius: 20px; padding: 10px 18px;
-      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
-      font-size: 0.9rem; font-weight: 500; color: var(--text); cursor: pointer;
-      display: flex; align-items: center; gap: 6px; text-decoration: none;
-    }
-    .nav-btn:active { box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color); }
-
-    .theme-toggle-btn {
-      background: var(--surface0); border: none; border-radius: 50%; width: 40px; height: 40px;
-      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
-      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; color: var(--icon-color);
-    }
-
-    .hamburger-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-      background: var(--surface0); border: none; border-radius: 50%; width: 40px; height: 40px;
-      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color); cursor: pointer;
-    }
-    .hamburger-line { display: block; width: 20px; height: 2px; background: var(--icon-color); border-radius: 2px; transition: transform 0.3s, opacity 0.2s; }
-    .hamburger-btn.open .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .hamburger-btn.open .hamburger-line:nth-child(2) { opacity: 0; }
-    .hamburger-btn.open .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-    .dropdown-menu {
-      position: absolute; top: 55px; right: 20px; background: var(--surface0); border-radius: 20px;
-      box-shadow: 10px 10px 20px var(--shadow-color), -10px -10px 20px var(--highlight-color);
-      padding: 12px; display: none; flex-direction: column; gap: 8px; z-index: 20; min-width: 180px;
-    }
-    .profile-dropdown { left: 0; right: auto; }
-    .dropdown-menu button, .dropdown-menu a {
-      background: var(--surface1); border: none; border-radius: 20px; padding: 10px 16px;
-      box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color);
-      text-align: left; font-size: 0.9rem; font-weight: 500; color: var(--text); cursor: pointer;
-      display: flex; align-items: center; gap: 8px; width: 100%; text-decoration: none;
-    }
-
-    /* search */
-    .search-wrapper { position: relative; margin-bottom: 24px; }
-    .search-wrapper input {
-      width: 100%; padding: 14px 20px 14px 48px; border: none; border-radius: 30px;
-      background: var(--surface1); box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color);
-      font-size: 1rem; color: var(--text); outline: none;
-    }
-    .search-wrapper i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--icon-color); }
-
-    /* komponen neumorphic */
-    .neu-card { background: var(--surface0); border-radius: 24px; box-shadow: 8px 8px 16px var(--shadow-color), -8px -8px 16px var(--highlight-color); padding: 24px; margin-bottom: 20px; }
-    .section-title { font-size: 1.4rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--text); }
-    .section-title i { color: var(--icon-color); }
-    .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .quiz-card { background: var(--surface0); border-radius: 24px; box-shadow: 8px 8px 16px var(--shadow-color), -8px -8px 16px var(--highlight-color); padding: 20px; cursor: pointer; }
-    .quiz-card:hover { transform: translateY(-4px); box-shadow: 12px 12px 24px var(--shadow-color), -12px -12px 24px var(--highlight-color); }
-    .leaderboard-list { list-style: none; margin-top: 8px; }
-    .leaderboard-list li { display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px; margin-bottom: 8px; background: var(--surface0); box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color); }
-    .quiz-option { display: block; width: 100%; text-align: left; margin: 10px 0; padding: 14px 20px; background: var(--surface1); border: none; border-radius: 20px; box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color); color: var(--text); font-size: 1rem; cursor: pointer; }
-    .quiz-option.selected { box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color); font-weight: 700; }
-    .screen { display: none; flex: 1; } .screen.active { display: block; }
-    .review-item { background: var(--surface1); border-radius: 16px; padding: 16px; margin-bottom: 15px; box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color); }
-    .correct { color: var(--green); } .wrong { color: var(--red); }
-    .app-footer { margin-top: auto; text-align: center; padding: 20px; font-size: 0.85rem; color: var(--subtext1); border-top: 1px solid var(--overlay0); }
-    .empty-message { text-align: center; color: var(--subtext1); padding: 20px; font-style: italic; }
-    .skeleton .skeleton-title, .skeleton .skeleton-meta, .skeleton .skeleton-badges { background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
-    .skeleton-title { height: 1rem; width: 60%; margin-bottom: 10px; } .skeleton-meta { height: 0.7rem; width: 40%; margin-bottom: 10px; } .skeleton-badges { height: 0.7rem; width: 30%; }
-    .skeleton-leaderboard { height: 1rem; width: 100%; background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; margin-bottom: 8px; }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-    @media (min-width: 768px) { .nav-links { display: flex; } .hamburger-btn { display: none; } .dropdown-menu { display: none !important; } }
-    @media (max-width: 767px) { .quiz-grid { grid-template-columns: 1fr; } .brand-title { font-size: 0.9rem; } }
-  </style>
 </head>
 <body>
   <div class="app-wrapper">
+    <!-- HEADER / NAVBAR -->
     <header id="mainNavbar" class="app-header" style="display: none;">
       <div class="header-left">
         <div class="avatar-wrapper" id="profileTrigger">
@@ -133,18 +23,28 @@
         </div>
         <span class="brand-title">IRMA Baitussalam</span>
       </div>
+
+      <!-- Menu Desktop (inline) -->
       <div class="nav-links">
         <button id="navHomeDesktop" class="nav-btn"><i class="ti ti-home"></i> Beranda</button>
         <a href="https://irmabaitussalam.github.io/kontak" class="nav-btn"><i class="ti ti-mail"></i> Kontak</a>
         <button id="toggleThemeDesktop" class="theme-toggle-btn"><i class="ti ti-moon"></i></button>
       </div>
+
+      <!-- Tombol Hamburger (mobile) -->
       <button id="hamburgerBtn" class="hamburger-btn">
-        <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
       </button>
+
+      <!-- Dropdown Profil -->
       <div id="profileDropdown" class="dropdown-menu profile-dropdown">
         <p style="font-weight:600; margin-bottom:8px;" id="profileName"></p>
         <button id="logoutBtnFromDropdown"><i class="ti ti-logout"></i> Keluar</button>
       </div>
+
+      <!-- Dropdown Hamburger (mobile) -->
       <div id="hamburgerDropdown" class="dropdown-menu">
         <button id="navHomeMobile"><i class="ti ti-home"></i> Beranda</button>
         <a href="https://irmabaitussalam.github.io/kontak"><i class="ti ti-mail"></i> Kontak</a>
@@ -152,26 +52,31 @@
       </div>
     </header>
 
-    <!-- Layar login -->
+    <!-- LAYAR LOGIN -->
     <div id="loginScreen" class="screen active">
       <div class="neu-card" style="max-width: 400px; margin: 60px auto; text-align: center;">
         <i class="ti ti-book" style="font-size: 3rem; color: var(--icon-color);"></i>
         <h2>Masuk ke IRMA Quiz</h2>
-        <p style="color: var(--subtext1);">Gunakan akun Google</p>
+        <p style="color: var(--subtext1);">Gunakan akun Google untuk melanjutkan</p>
         <button id="googleLoginBtn" class="nav-btn" style="margin-top: 20px; padding: 12px 28px; font-size: 1rem;">
           <i class="ti ti-brand-google"></i> Masuk dengan Google
         </button>
+        <p style="font-size: 0.75rem; color: var(--subtext1); margin-top: 20px;">
+          Dengan masuk, kamu setuju dengan ketentuan kuis IRMA Baitussalam
+        </p>
       </div>
     </div>
 
-    <!-- Dashboard -->
+    <!-- DASHBOARD -->
     <div id="dashboardScreen" class="screen">
       <div class="search-wrapper">
         <i class="ti ti-search"></i>
-        <input type="text" id="searchInput" placeholder="Cari kuis...">
+        <input type="text" id="searchInput" placeholder="Cari kuis atau materi...">
       </div>
+
       <div class="section-title"><i class="ti ti-clipboard-list"></i> Kuis Terbaru</div>
       <div id="quizContainer" class="quiz-grid"></div>
+
       <div class="neu-card">
         <div class="section-title"><i class="ti ti-trophy"></i> Ranking Peserta</div>
         <ul id="leaderboardList" class="leaderboard-list"></ul>
@@ -179,150 +84,57 @@
       </div>
     </div>
 
-    <!-- Kontak -->
+    <!-- KONTAK -->
     <div id="contactScreen" class="screen">
       <div class="neu-card" style="max-width: 600px; margin: 0 auto;">
-        <h2><i class="ti ti-mail"></i> Kontak Kami</h2>
-        <p><i class="ti ti-map-pin"></i> Jl. Baitussalam No. 22, Garut</p>
-        <p><i class="ti ti-phone"></i> +62 812-3456-7890</p>
-        <p><i class="ti ti-mail"></i> irma.baitussalam@example.com</p>
+        <h2 style="margin-bottom: 16px;"><i class="ti ti-mail"></i> Kontak Kami</h2>
+        <p style="margin-bottom: 12px;"><i class="ti ti-map-pin"></i> Jl. Baitussalam No. 22, Garut</p>
+        <p style="margin-bottom: 12px;"><i class="ti ti-phone"></i> +62 812-3456-7890</p>
+        <p style="margin-bottom: 12px;"><i class="ti ti-mail"></i> irma.baitussalam@example.com</p>
         <p><i class="ti ti-brand-instagram"></i> @irmabaitussalam</p>
       </div>
     </div>
 
-    <!-- Layar kuis & hasil (tetap) -->
-    <div id="quizScreen" class="screen">...</div>
-    <div id="resultScreen" class="screen">...</div>
-    <footer class="app-footer">2014–<span id="currentYear"></span> IRMA Baitussalam</footer>
+    <!-- LAYAR KUIS -->
+    <div id="quizScreen" class="screen">
+      <div class="neu-card" id="quizCard">
+        <h2 id="quizTitle"></h2>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <p id="questionNumber" style="font-weight:600;"></p>
+        <p id="questionText" style="margin: 12px 0;"></p>
+        <div id="optionsContainer"></div>
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+          <button id="prevQuestionBtn" class="icon-btn" style="width: auto; padding: 10px 20px; border-radius: 30px; background: var(--surface0); color: var(--text);"><i class="ti ti-arrow-left"></i> Sebelumnya</button>
+          <button id="nextQuestionBtn" class="icon-btn" style="width: auto; padding: 10px 20px; border-radius: 30px; background: var(--surface0); color: var(--text);">Selanjutnya <i class="ti ti-arrow-right"></i></button>
+        </div>
+        <button id="submitQuizBtn" class="icon-btn" style="width:100%; margin-top:12px; display:none; border-radius: 30px; background: var(--surface0); color: var(--text);"><i class="ti ti-check"></i> Selesai & Lihat Skor</button>
+      </div>
+    </div>
+
+    <!-- LAYAR HASIL -->
+    <div id="resultScreen" class="screen">
+      <div class="neu-card" style="max-width: 700px; margin: 0 auto;">
+        <div id="resultSummary" style="text-align: center;">
+          <i class="ti ti-rosette" style="font-size:3rem; color: var(--icon-color);"></i>
+          <h2>Kuis Selesai!</h2>
+          <p style="font-size:1.2rem;">Skor kamu: <strong id="resultScore"></strong></p>
+        </div>
+        <div id="reviewContainer" style="margin-top: 20px;"></div>
+        <button id="backToHomeBtn" class="icon-btn" style="width: auto; margin: 20px auto 0; padding: 12px 24px; border-radius: 30px; background: var(--surface0); color: var(--text);"><i class="ti ti-home"></i> Kembali ke Beranda</button>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      2014–<span id="currentYear"></span> IRMA Baitussalam
+    </footer>
   </div>
 
-  <script>
-    // ========== KONFIGURASI FIREBASE ==========
-    const firebaseConfig = { apiKey: "AIzaSyAhJNw0GIs1lPxOHMws-C9M3ot8SO-2dJE", ... };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth(); const db = firebase.firestore();
-
-    // ========== DATA QUIZ ==========
-    const sampleQuizzes = [ /* ... sama seperti sebelumnya ... */ ];
-
-    // ========== STATE & DOM ==========
-    let currentUser = null, currentQuiz = null, currentQuestionIndex = 0, userAnswers = [];
-    // ... (semua elemen DOM)
-
-    // ========== THEME & NAV ==========
-    function setTheme(theme) { /* ... */ }
-
-    // ** Perbaikan dropdown profil **
-    const avatarWrapper = document.getElementById('profileTrigger');
-    avatarWrapper.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = profileDropdown.style.display === 'flex';
-      profileDropdown.style.display = isOpen ? 'none' : 'flex';
-      hamburgerDropdown.style.display = 'none';
-      hamburgerBtn.classList.remove('open');
-    });
-
-    // Hamburger events
-    hamburgerBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = hamburgerDropdown.style.display === 'flex';
-      if (isOpen) { closeHamburger(); } else { openHamburger(); }
-    });
-
-    function closeHamburger() { hamburgerDropdown.style.display='none'; hamburgerBtn.classList.remove('open'); }
-    function openHamburger() { hamburgerDropdown.style.display='flex'; hamburgerBtn.classList.add('open'); profileDropdown.style.display='none'; }
-
-    document.addEventListener('click', () => {
-      profileDropdown.style.display = 'none';
-      closeHamburger();
-    });
-
-    // ** Routing hash **
-    function handleHashChange() {
-      const hash = window.location.hash;
-      if (hash.startsWith('#/quiz/')) {
-        const slug = hash.replace('#/quiz/', '');
-        const quiz = sampleQuizzes.find(q => slugify(q.title) === slug);
-        if (quiz && currentUser) {
-          handleQuizClick(quiz); // akan membuka kuis atau review
-        }
-      } else if (hash === '') {
-        showScreen('dashboardScreen');
-      }
-    }
-    window.addEventListener('hashchange', handleHashChange);
-    // Saat login sukses, panggil handleHashChange untuk memproses hash yang mungkin sudah ada
-    function onLoginSuccess() {
-      showScreen('dashboardScreen');
-      loadQuizzes();
-      loadLeaderboard();
-      handleHashChange(); // jika ada hash kuis, langsung buka
-    }
-    // ... auth listener ...
-
-    // Bantu slug
-    function slugify(text) {
-      return text.toLowerCase().replace(/[^\w]+/g, '-').replace(/^-+|-+$/g, '');
-    }
-
-    // Saat kartu kuis diklik, update hash
-    async function handleQuizClick(quiz) {
-      if (!currentUser) return;
-      // update URL tanpa reload
-      window.location.hash = '#/quiz/' + slugify(quiz.title);
-      const attempt = await getUserAttempt(quiz.id);
-      if (attempt) {
-        showReviewScreen(quiz, attempt.answers, attempt.score);
-      } else {
-        startQuiz(quiz);
-      }
-    }
-
-    // ** Perbaikan ranking NaN **
-    function safeNumber(val) {
-      const n = Number(val);
-      return isNaN(n) ? 0 : n;
-    }
-
-    async function loadLeaderboard() {
-      try {
-        const snapshot = await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get();
-        leaderboardList.innerHTML = '';
-        if (snapshot.empty) { leaderboardEmpty.style.display='block'; return; }
-        leaderboardEmpty.style.display='none';
-        snapshot.forEach((doc, i) => {
-          const data = doc.data();
-          const score = safeNumber(data.totalScore);
-          const li = document.createElement('li');
-          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${data.name}</span> <strong>${score} poin</strong>`;
-          leaderboardList.appendChild(li);
-        });
-      } catch (err) {
-        // fallback lokal dengan safeNumber juga
-        const local = getLocalLeaderboard();
-        leaderboardList.innerHTML = '';
-        if (local.length===0) { leaderboardEmpty.style.display='block'; return; }
-        leaderboardEmpty.style.display='none';
-        local.sort((a,b)=> safeNumber(b.totalScore) - safeNumber(a.totalScore));
-        local.forEach((u,i)=>{
-          const li = document.createElement('li');
-          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${safeNumber(u.totalScore)} poin</strong>`;
-          leaderboardList.appendChild(li);
-        });
-      }
-    }
-
-    // Di addToLocalLeaderboard juga pakai safeNumber
-    function addToLocalLeaderboard(score) {
-      const leaderboard = getLocalLeaderboard();
-      const existing = leaderboard.find(e=>e.email===currentUser.email);
-      if (existing) {
-        existing.totalScore = safeNumber(existing.totalScore) + score;
-      } else {
-        leaderboard.push({ email: currentUser.email, name: currentUser.displayName, totalScore: score });
-      }
-      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(leaderboard));
-    }
-  </script>
+  <!-- Data Kuis -->
+  <script src="data/quiz-1.js"></script>
+  <script src="data/quiz-2.js"></script>
+  <script src="data/quiz-3.js"></script>
+  <!-- Tema & Script Utama -->
+  <script src="theme.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
