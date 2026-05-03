@@ -296,8 +296,32 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .correct { color:var(--green); font-weight:600; } .wrong { color:var(--red); font-weight:600; }
 
 .app-footer { margin-top:auto; text-align:center; padding:20px; font-size:0.85rem; color:var(--subtext1); border-top:1px solid var(--overlay0); }
-.screen { display:none; flex:1; } .screen.active { display:block; }
+.screen {
+  display: none;
+  flex: 1;
+  overflow-y: auto;           /* konten panjang bisa di-scroll, footer tetap di bawah */
+  padding-bottom: 20px;       /* ruang nyaman sebelum footer */
+  box-sizing: border-box;
+}
+.screen.active {
+  display: flex;
+  flex-direction: column;     /* agar konten bisa diatur dengan flex jika perlu */
+}
+/* Untuk layar hasil yang review-nya panjang, pastikan scroll bekerja */
+#resultScreen .neu-card {
+  max-height: calc(100vh - 200px); /* opsional, batasi tinggi maksimum card */
+  overflow-y: auto;               /* jika konten melebihi, bisa di-scroll di dalam card */
+}
 
+#quizScreen.active {
+  display: flex;
+  flex-direction: column;
+}
+#quizCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 /* Skeleton */
 .skeleton .skeleton-title, .skeleton .skeleton-meta, .skeleton .skeleton-badges {
   background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%);
