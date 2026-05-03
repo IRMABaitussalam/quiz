@@ -13,12 +13,14 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = null;
-let currentQuiz = null;
+let currentQuiz = null;          // berisi objek kuis lengkap (dengan questions yang sudah diacak)
 let currentQuestionIndex = 0;
-let userAnswers = [];
+let userResponses = [];          // { answerIndex, timeElapsed }
+let questionAnswered = [];       // boolean per soal
+let timerSeconds = 0;
+let timerInterval = null;
 let sampleQuizzes = [];
 
-// Helper: ambil elemen
 const $ = (id) => document.getElementById(id);
 const mainNavbar = $('mainNavbar');
 const profileTrigger = $('profileTrigger');
@@ -46,37 +48,38 @@ const submitBtn = $('submitQuizBtn');
 const resultScore = $('resultScore');
 const reviewContainer = $('reviewContainer');
 const backToHomeBtn = $('backToHomeBtn');
+const timerText = $('timerText');
+const statModal = $('statModal');
+const statContent = $('statContent');
+const closeStatModal = $('closeStatModal');
 
 $('currentYear').textContent = new Date().getFullYear();
 
-// Sembunyikan semua screen utama, tampilkan loading
+// Sembunyikan semua screen, tampilkan loading
 ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(id => {
   const el = $(id);
   if (el) el.classList.remove('active');
 });
 $('loadingScreen').style.display = 'flex';
 
-// Layar
 function showScreen(id) {
   ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(s => $(s).classList.remove('active'));
   const el = $(id); if (el) el.classList.add('active');
   if (mainNavbar) mainNavbar.style.display = (id === 'loginScreen') ? 'none' : 'flex';
 }
 
-// Autentikasi
+// Auth
 googleLoginBtn.addEventListener('click', () => {
   auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('Login gagal: ' + e.message));
 });
 logoutBtn.addEventListener('click', () => auth.signOut());
 
 auth.onAuthStateChanged(user => {
-  // Hapus loading screen
   const loader = $('loadingScreen');
   if (loader) {
     loader.classList.add('fade-out');
     setTimeout(() => { loader.style.display = 'none'; }, 300);
   }
-
   if (user) {
     currentUser = { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL };
     profileName.textContent = user.displayName || 'Peserta';
@@ -94,7 +97,7 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// Dropdown & hamburger
+// Dropdown & hamburger (sama seperti sebelumnya)
 profileTrigger.addEventListener('click', (e) => {
   e.stopPropagation();
   profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
@@ -137,7 +140,7 @@ function checkHash() {
 window.addEventListener('hashchange', checkHash);
 function navigateToQuiz(quiz) { window.location.hash = '#/' + slugify(quiz.title); }
 
-// Skeleton
+// Skeleton (sama)
 function renderSkeletonQuizzes() {
   quizContainer.innerHTML = '';
   for (let i=0;i<6;i++) {
@@ -190,26 +193,22 @@ function loadQuizzes(filter='') {
 }
 searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-// Firestore + localStorage
+// Firestore + localStorage (leaderboard & attempts)
 const ATTEMPTS_KEY = 'irmaQuizAttempts_local';
 const LEADERBOARD_KEY = 'irmaQuizLeaderboard_local';
 
-function getLocalAttempts() {
-  return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '{}');
-}
-function saveLocalAttempt(qid, ans, score) {
+function getLocalAttempts() { return JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || '{}'); }
+function saveLocalAttempt(qid, responses, score) {
   const a = getLocalAttempts();
   if (!a[currentUser.email]) a[currentUser.email] = {};
-  a[currentUser.email][qid] = { answers: ans, score, date: new Date().toISOString() };
+  const totalQuestions = currentQuiz.questions.length;
+  const correctCount = responses.filter((r, i) => r && r.answerIndex === currentQuiz.questions[i].answer).length;
+  const totalTime = responses.reduce((sum, r) => sum + (r?.timeElapsed || 0), 0);
+  a[currentUser.email][qid] = { responses, score, correctCount, totalQuestions, totalTime, date: new Date().toISOString() };
   localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(a));
 }
-function getLocalLeaderboard() {
-  return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
-}
-function safeNum(v) {
-  const n = parseInt(v, 10);
-  return isNaN(n) ? 0 : n;
-}
+function getLocalLeaderboard() { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); }
+function safeNum(v) { const n = parseInt(v,10); return isNaN(n)?0:n; }
 function cleanName(name) {
   if (typeof name !== 'string') return 'Tanpa Nama';
   const trimmed = name.trim();
@@ -225,6 +224,7 @@ function addToLocalLeaderboard(score) {
   } else {
     lb.push({
       email: currentUser.email,
+      uid: currentUser.uid, // tambahkan uid
       name: displayName,
       totalScore: score
     });
@@ -248,19 +248,25 @@ async function getUserAttempt(qid) {
     return a || null;
   }
 }
-async function saveAttempt(qid, ans, score) {
+async function saveAttempt(qid, responses, score) {
   try {
+    const totalQuestions = currentQuiz.questions.length;
+    const correctCount = responses.filter((r, i) => r && r.answerIndex === currentQuiz.questions[i].answer).length;
+    const totalTime = responses.reduce((sum, r) => sum + (r?.timeElapsed || 0), 0);
     await db.collection('attempts').doc(`${currentUser.uid}_${qid}`).set({
       uid: currentUser.uid,
       email: currentUser.email,
       quizId: qid,
-      answers: ans,
+      responses,
       score,
+      correctCount,
+      totalQuestions,
+      totalTime,
       date: firebase.firestore.FieldValue.serverTimestamp()
     });
     await addToLeaderboard(score);
   } catch (e) {
-    saveLocalAttempt(qid, ans, score);
+    saveLocalAttempt(qid, responses, score);
     addToLocalLeaderboard(score);
   }
 }
@@ -285,28 +291,27 @@ async function addToLeaderboard(score) {
   }
 }
 
-// Leaderboard: kumpulkan semua data ke array, lalu render
 async function loadLeaderboard() {
   try {
     const snapshot = await db.collection('leaderboard')
       .orderBy('totalScore', 'desc')
       .limit(20)
       .get();
-
     const leaderboardArray = [];
     snapshot.forEach(doc => {
       const data = doc.data();
       leaderboardArray.push({
+        uid: doc.id, // gunakan doc.id sebagai uid
         name: cleanName(data.name),
         score: safeNum(data.totalScore)
       });
     });
-
     renderLeaderboardArray(leaderboardArray);
   } catch (e) {
     console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', e);
     const local = getLocalLeaderboard();
     const cleaned = local.map(u => ({
+      uid: u.uid || u.email,
       name: cleanName(u.name),
       score: safeNum(u.totalScore)
     }));
@@ -333,102 +338,294 @@ function renderLeaderboardArray(arr) {
     li.innerHTML = `
       ${rankDisplay}
       <span class="rank-name-wrapper">
-        <span class="rank-name">${item.name}</span>
+        <span class="rank-name" style="cursor:pointer;" data-uid="${item.uid || ''}">${item.name}</span>
       </span>
       <span class="rank-score"><strong>${item.score} poin</strong></span>
     `;
+    const nameSpan = li.querySelector('.rank-name');
+    if (nameSpan) {
+      nameSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showUserStats(item.uid);
+      });
+    }
     leaderboardList.appendChild(li);
   });
 }
 
-// Quiz engine
+async function showUserStats(uid) {
+  statContent.innerHTML = 'Memuat...';
+  statModal.style.display = 'flex';
+  try {
+    const attemptsSnap = await db.collection('attempts')
+      .where('uid', '==', uid)
+      .get();
+
+    let totalCorrect = 0;
+    let totalQuestions = 0;
+    let totalTime = 0;
+    let totalScore = 0;
+
+    attemptsSnap.forEach(doc => {
+      const d = doc.data();
+      if (d.correctCount !== undefined) {
+        totalCorrect += d.correctCount || 0;
+        totalQuestions += d.totalQuestions || 0;
+        totalTime += d.totalTime || 0;
+      } else if (d.responses) {
+        // fallback: hitung waktu dari responses
+        const timeSum = (d.responses || []).reduce((s, r) => s + (r?.timeElapsed || 0), 0);
+        totalTime += timeSum;
+        totalQuestions += (d.responses || []).length;
+      }
+      totalScore += d.score || 0;
+    });
+
+    if (totalQuestions === 0) {
+      statContent.innerHTML = '<p>Tidak ada data kuis.</p>';
+      return;
+    }
+
+    const totalWrong = totalQuestions - totalCorrect;
+    const avgTime = totalQuestions ? (totalTime / totalQuestions).toFixed(1) : 0;
+    const correctRate = totalQuestions ? ((totalCorrect / totalQuestions) * 100).toFixed(1) : 0;
+    const wrongRate = totalQuestions ? ((totalWrong / totalQuestions) * 100).toFixed(1) : 0;
+
+    let userRank = '-';
+    try {
+      const leaderSnapshot = await db.collection('leaderboard')
+        .orderBy('totalScore', 'desc')
+        .get();
+      const list = [];
+      leaderSnapshot.forEach(doc => list.push({ uid: doc.id, ...doc.data() }));
+      const idx = list.findIndex(u => u.uid === uid);
+      if (idx >= 0) userRank = idx + 1;
+    } catch (e) { console.warn(e); }
+
+    statContent.innerHTML = `
+      <div class="stat-row"><span class="stat-label">Ranking</span><span class="stat-value">${userRank}</span></div>
+      <div class="stat-row"><span class="stat-label">Total Poin</span><span class="stat-value">${totalScore}</span></div>
+      <div class="stat-row"><span class="stat-label">Soal Terjawab</span><span class="stat-value">${totalQuestions}</span></div>
+      <div class="stat-row"><span class="stat-label">Jawaban Benar</span><span class="stat-value">${totalCorrect}</span></div>
+      <div class="stat-row"><span class="stat-label">Jawaban Salah</span><span class="stat-value">${totalWrong}</span></div>
+      <div class="stat-row"><span class="stat-label">Rata‑rata Waktu/Soal</span><span class="stat-value">${avgTime} detik</span></div>
+      <div class="stat-row"><span class="stat-label">Peluang Benar (mendatang)</span><span class="stat-value">${correctRate}%</span></div>
+      <div class="stat-row"><span class="stat-label">Peluang Salah (mendatang)</span><span class="stat-value">${wrongRate}%</span></div>
+    `;
+  } catch (e) {
+    console.error(e);
+    statContent.innerHTML = '<p>Gagal memuat statistik.</p>';
+  }
+}
+
+closeStatModal.addEventListener('click', () => {
+  statModal.style.display = 'none';
+});
+window.addEventListener('click', (e) => {
+  if (e.target === statModal) statModal.style.display = 'none';
+});
+
+// ==================== PENGACAKAN ====================
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ==================== HANDLE QUIZ CLICK ====================
 async function handleQuizClick(quiz) {
   if (!currentUser) return;
   const att = await getUserAttempt(quiz.id);
-  att ? showReviewScreen(quiz, att.answers, att.score) : startQuiz(quiz);
+  if (att) {
+    // Jika sudah pernah mengerjakan, tampilkan review (tidak perlu acak)
+    // Asumsikan data respons dan soal asli disimpan dalam att
+    showReviewScreen(quiz, att.responses || att.answers, att.score);
+    return;
+  }
+  startQuiz(quiz); // akan melakukan pengacakan
 }
 
 function startQuiz(quiz) {
-  currentQuiz = quiz;
+  // Acak urutan soal
+  const shuffledQuestions = shuffleArray([...quiz.questions]);
+  // Acak opsi tiap soal dan sesuaikan indeks jawaban
+  const processedQuestions = shuffledQuestions.map(q => {
+    const correctText = q.options[q.answer];
+    const shuffledOptions = shuffleArray([...q.options]);
+    const newAnswerIndex = shuffledOptions.indexOf(correctText);
+    return {
+      ...q,
+      options: shuffledOptions,
+      answer: newAnswerIndex,
+      // simpan jawaban asli (teks) untuk keperluan review? Tidak perlu karena kita sudah punya q.answer yang baru
+    };
+  });
+  currentQuiz = { ...quiz, questions: processedQuestions };
   currentQuestionIndex = 0;
-  userAnswers = new Array(quiz.questions.length).fill(null);
+  userResponses = new Array(processedQuestions.length).fill(null);
+  questionAnswered = new Array(processedQuestions.length).fill(false);
   showScreen('quizScreen');
   renderQuestion();
 }
 
+// ==================== TIMER ====================
+function clearTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+function startTimer() {
+  clearTimer();
+  timerSeconds = 0;
+  updateTimerDisplay(timerSeconds);
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    updateTimerDisplay(timerSeconds);
+  }, 1000);
+}
+function updateTimerDisplay(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (timerText) timerText.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ==================== JAWABAN ====================
+function selectAnswer(idx) {
+  if (!currentQuiz || questionAnswered[currentQuestionIndex]) return;
+  clearTimer();
+  const timeElapsed = timerSeconds;
+  userResponses[currentQuestionIndex] = { answerIndex: idx, timeElapsed };
+  questionAnswered[currentQuestionIndex] = true;
+  renderQuestion(true);
+}
+
+// Fungsi hitung skor
+function calculateScore(question, timeElapsed) {
+  if (timeElapsed >= question.timeLimit) return question.minScore;
+  const step = question.deductionStep || 2;
+  const steps = Math.floor(timeElapsed / step);
+  const totalSteps = Math.floor(question.timeLimit / step);
+  const reduction = totalSteps > 0 ? ((question.maxScore - question.minScore) / totalSteps) : 0;
+  return Math.max(question.minScore, Math.round(question.maxScore - steps * reduction));
+}
+
+// ==================== NAVIGASI SOAL ====================
 function prevAction() {
   if (currentQuestionIndex === 0) {
-    goHome();
+    goHome(); // tombol rumah "Kembali"
   } else {
+    clearTimer();
     currentQuestionIndex--;
     renderQuestion();
   }
 }
 function nextAction() {
   if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+    clearTimer();
     currentQuestionIndex++;
     renderQuestion();
   }
 }
 
-function renderQuestion() {
+function renderQuestion(skipTimer = false) {
   if (!currentQuiz) return;
-  const q = currentQuiz.questions[currentQuestionIndex];
+  clearTimer();
+  const qi = currentQuestionIndex;
+  const q = currentQuiz.questions[qi];
   quizTitle.textContent = currentQuiz.title;
-  questionNumber.textContent = `Soal ${currentQuestionIndex + 1} dari ${currentQuiz.questions.length}`;
+  questionNumber.textContent = `Soal ${qi + 1} dari ${currentQuiz.questions.length}`;
   questionText.innerHTML = q.question;
-  progressFill.style.width = ((currentQuestionIndex + 1) / currentQuiz.questions.length * 100) + '%';
+  progressFill.style.width = ((qi + 1) / currentQuiz.questions.length * 100) + '%';
 
+  // Timer
+  if (!questionAnswered[qi] && !skipTimer) {
+    startTimer();
+  } else {
+    const resp = userResponses[qi];
+    updateTimerDisplay(resp ? resp.timeElapsed : 0);
+  }
+
+  // Opsi
   optionsContainer.innerHTML = '';
   q.options.forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.className = 'quiz-option';
-    if (userAnswers[currentQuestionIndex] === idx) btn.classList.add('selected');
+    if (userResponses[qi]?.answerIndex === idx) btn.classList.add('selected');
     btn.innerHTML = opt;
+    btn.disabled = questionAnswered[qi];
     btn.addEventListener('click', () => {
-      userAnswers[currentQuestionIndex] = idx;
-      renderQuestion();
+      if (!questionAnswered[qi]) selectAnswer(idx);
     });
     optionsContainer.appendChild(btn);
   });
 
   // Tombol navigasi
-  prevBtn.onclick = prevAction;
-  prevBtn.style.display = 'flex';
-  if (currentQuestionIndex === currentQuiz.questions.length - 1) {
+  if (qi === 0) {
+    // Soal pertama: tombol dengan ikon rumah dan teks "Kembali"
+    prevBtn.className = 'quiz-nav-btn-text';
+    prevBtn.innerHTML = '<i class="ti ti-home"></i> Kembali';
+    prevBtn.onclick = () => goHome();
+    prevBtn.style.display = 'flex';
+  } else {
+    prevBtn.className = 'icon-btn quiz-nav-btn';
+    prevBtn.innerHTML = '<i class="ti ti-arrow-left"></i>';
+    prevBtn.onclick = prevAction;
+    prevBtn.style.display = 'flex';
+  }
+
+  if (qi === currentQuiz.questions.length - 1) {
     nextBtn.style.display = 'none';
     submitBtn.style.display = 'block';
   } else {
+    nextBtn.className = 'icon-btn quiz-nav-btn';
+    nextBtn.innerHTML = '<i class="ti ti-arrow-right"></i>';
     nextBtn.onclick = nextAction;
     nextBtn.style.display = 'flex';
     submitBtn.style.display = 'none';
   }
 }
 
+// ==================== SUBMIT ====================
 submitBtn.addEventListener('click', async () => {
   if (!currentQuiz) return;
-  let score = 0;
+  clearTimer();
+  const responses = [...userResponses];
+  let totalScore = 0;
   currentQuiz.questions.forEach((q, i) => {
-    if (userAnswers[i] === q.answer) score++;
+    const resp = responses[i];
+    if (resp && resp.answerIndex === q.answer) {
+      // Jawaban benar, hitung skor berdasarkan waktu
+      totalScore += calculateScore(q, resp.timeElapsed);
+    }
   });
-  await saveAttempt(currentQuiz.id, [...userAnswers], score);
-  showReviewScreen(currentQuiz, userAnswers, score);
+  await saveAttempt(currentQuiz.id, responses, totalScore);
+  showReviewScreen(currentQuiz, responses, totalScore);
   loadLeaderboard();
 });
 
-function showReviewScreen(quiz, answers, score) {
+// ==================== REVIEW ====================
+function showReviewScreen(quiz, responses, score) {
   currentQuiz = quiz;
-  resultScore.textContent = `${score} / ${quiz.questions.length}`;
+  resultScore.textContent = `${score} poin`;
   let html = '';
   quiz.questions.forEach((q, i) => {
-    const ua = answers[i];
-    const ok = ua === q.answer;
-    html += `<div class="review-item">
-      <p><strong>Soal ${i + 1}:</strong> ${q.question} ${ok ? '<i class="ti ti-check correct"></i>' : '<i class="ti ti-x wrong"></i>'}</p>
-      <p>Jawaban kamu: <span class="${ok ? 'correct' : 'wrong'}">${ua != null ? q.options[ua] : 'Tidak dijawab'}</span></p>
-      ${!ok ? `<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>` : ''}
-      <p style="font-style:italic; margin-top:6px;">📘 ${q.explanation}</p>
-    </div>`;
+    const resp = responses[i];
+    const ok = resp && resp.answerIndex === q.answer;
+    const userAns = resp ? q.options[resp.answerIndex] : 'Tidak dijawab';
+    const timeInfo = resp ? `${resp.timeElapsed} detik` : '—';
+    const scoreInfo = resp ? (ok ? `Skor: ${calculateScore(q, resp.timeElapsed)}` : 'Skor: 0') : 'Skor: 0';
+    html += `
+      <div class="review-item">
+        <p><strong>Soal ${i + 1}:</strong> ${q.question} ${ok ? '<i class="ti ti-check correct"></i>' : '<i class="ti ti-x wrong"></i>'}</p>
+        <p>Jawaban kamu: <span class="${ok ? 'correct' : 'wrong'}">${userAns}</span> <span style="color:var(--subtext1);font-size:0.8rem;">(${timeInfo})</span></p>
+        ${!ok ? `<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>` : ''}
+        <p style="font-style:italic;">📘 ${q.explanation}</p>
+        <p style="font-weight:600;">${scoreInfo}</p>
+      </div>
+    `;
   });
   reviewContainer.innerHTML = html;
   showScreen('resultScreen');
@@ -440,7 +637,7 @@ backToHomeBtn.addEventListener('click', () => {
   window.location.hash = '';
 });
 
-// Inisialisasi (auto-detect quizzes)
+// ==================== INISIALISASI ====================
 function initApp() {
   sampleQuizzes = window.IRMA_QUIZZES || [];
   if (!sampleQuizzes.length) {

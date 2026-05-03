@@ -76,6 +76,9 @@
     <div id="quizScreen" class="screen">
       <div class="neu-card" id="quizCard">
         <h2 id="quizTitle"></h2>
+        <div class="quiz-timer" id="quizTimer">
+          <i class="ti ti-clock"></i> <span id="timerText">00:30</span>
+        </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <p id="questionNumber" style="font-weight:600;"></p>
         <p id="questionText" style="margin:12px 0;"></p>
@@ -100,6 +103,15 @@
         <button id="backToHomeBtn" class="icon-btn back-home-btn"><i class="ti ti-home"></i> Kembali ke Beranda</button>
       </div>
     </div>
+
+    <!-- Statistik Modal -->
+<div id="statModal" class="modal-overlay" style="display: none;">
+  <div class="modal-card neu-card stat-card">
+    <h3 style="margin-bottom:12px;">Statistik Peserta</h3>
+    <div id="statContent"></div>
+    <button id="closeStatModal" class="nav-btn" style="margin-top:12px;">Tutup</button>
+  </div>
+</div>
 
     <footer class="app-footer">2014–<span id="currentYear"></span> IRMA Baitussalam</footer>
   </div>
