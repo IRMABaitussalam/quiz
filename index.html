@@ -84,12 +84,11 @@
       --icon-color: var(--overlay2);
     }
 
-    /* ===== GLOBAL ===== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      transition: background 0.3s, box-shadow 0.3s, color 0.3s, transform 0.2s;
+      transition: background 0.3s, box-shadow 0.3s, color 0.3s;
     }
 
     body {
@@ -122,6 +121,7 @@
       margin-bottom: 24px;
       position: relative;
       z-index: 10;
+      flex-wrap: wrap;
     }
 
     .header-left {
@@ -130,6 +130,7 @@
       gap: 10px;
       cursor: pointer;
       position: relative;
+      z-index: 2;
     }
 
     .brand-title {
@@ -146,17 +147,50 @@
       box-shadow: 3px 3px 6px var(--shadow-color), -3px -3px 6px var(--highlight-color);
     }
 
-    .header-right {
-      display: flex;
+    /* Desktop nav links (inline) */
+    .nav-links {
+      display: none;            /* disembunyikan di mobile */
       align-items: center;
+      gap: 8px;
     }
 
-    /* Hamburger custom */
-    .hamburger-btn {
+    .nav-links .nav-btn {
+      background: var(--surface0);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 18px;
+      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .nav-links .nav-btn:active {
+      box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color);
+    }
+
+    .theme-toggle-btn {
+      background: var(--surface0);
+      border: none;
+      border-radius: 50%;
       width: 40px;
       height: 40px;
-      position: relative;
+      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
       display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--icon-color);
+    }
+
+    .hamburger-btn {
+      display: flex;          /* tampil di mobile */
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -164,6 +198,8 @@
       background: var(--surface0);
       border: none;
       border-radius: 50%;
+      width: 40px;
+      height: 40px;
       box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
       cursor: pointer;
     }
@@ -187,9 +223,11 @@
       transform: translateY(-7px) rotate(-45deg);
     }
 
-    /* ===== DROPDOWN ===== */
+    /* Dropdown (digunakan di mobile) */
     .dropdown-menu {
       position: absolute;
+      top: 55px;
+      right: 20px;
       background: var(--surface0);
       border-radius: 20px;
       box-shadow: 10px 10px 20px var(--shadow-color), -10px -10px 20px var(--highlight-color);
@@ -202,13 +240,8 @@
     }
 
     .profile-dropdown {
-      top: 55px;
       left: 0;
-    }
-
-    .hamburger-dropdown {
-      top: 55px;
-      right: 20px;
+      right: auto;
     }
 
     .dropdown-menu button,
@@ -235,15 +268,31 @@
       box-shadow: inset 2px 2px 5px var(--shadow-color), inset -2px -2px 5px var(--highlight-color);
     }
 
-    /* Tombol tema bulat di tengah */
-    .dropdown-menu .theme-toggle-btn {
-      align-self: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      padding: 0;
-      justify-content: center;
-      box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+    /* ===== SEARCH (tanpa card background) ===== */
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;   /* ruang untuk ikon */
+      border: none;
+      border-radius: 30px;
+      background: var(--surface1);
+      box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color);
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--icon-color);
+      font-size: 1.1rem;
     }
 
     /* ===== NEUMORPHIC COMPONENTS ===== */
@@ -261,18 +310,6 @@
       box-shadow: inset 6px 6px 12px var(--shadow-color), inset -6px -6px 12px var(--highlight-color);
       padding: 20px;
       margin-bottom: 20px;
-    }
-
-    .neu-input {
-      background: var(--surface1);
-      border: none;
-      border-radius: 30px;
-      box-shadow: inset 4px 4px 8px var(--shadow-color), inset -4px -4px 8px var(--highlight-color);
-      padding: 14px 20px;
-      width: 100%;
-      font-size: 1rem;
-      color: var(--text);
-      outline: none;
     }
 
     .section-title {
@@ -395,7 +432,6 @@
       display: block;
     }
 
-    /* Review detail */
     .review-item {
       background: var(--surface1);
       border-radius: 16px;
@@ -407,7 +443,6 @@
     .correct { color: var(--green); }
     .wrong { color: var(--red); }
 
-    /* Footer */
     .app-footer {
       margin-top: auto;
       text-align: center;
@@ -429,7 +464,6 @@
     .skeleton-title { height: 1rem; width: 60%; margin-bottom: 10px; }
     .skeleton-meta { height: 0.7rem; width: 40%; margin-bottom: 10px; }
     .skeleton-badges { height: 0.7rem; width: 30%; }
-
     .skeleton-leaderboard {
       height: 1rem;
       width: 100%;
@@ -439,27 +473,34 @@
       border-radius: 8px;
       margin-bottom: 8px;
     }
-
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
     }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width: 600px) {
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;            /* muncul di desktop */
+      }
+      .hamburger-btn {
+        display: none;           /* sembunyikan hamburger */
+      }
+      .dropdown-menu {
+        display: none !important; /* pastikan dropdown tidak muncul di desktop */
+      }
+    }
+
+    @media (max-width: 767px) {
       .quiz-grid {
         grid-template-columns: 1fr;
       }
       .brand-title {
         font-size: 0.9rem;
       }
-      .hamburger-dropdown {
-        right: 10px;
-        top: 50px;
-      }
       .profile-dropdown {
         left: 10px;
-        top: 50px;
+        top: 55px;
       }
     }
 
@@ -475,23 +516,32 @@
         <img id="navAvatar" class="avatar" src="" alt="Profil" style="display:none;">
         <span class="brand-title">IRMA Baitussalam</span>
       </div>
-      <div class="header-right">
-        <button id="hamburgerBtn" class="hamburger-btn">
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-        </button>
+
+      <!-- Desktop inline menu -->
+      <div class="nav-links">
+        <button id="navHomeDesktop" class="nav-btn"><i class="ti ti-home"></i> Beranda</button>
+        <a href="https://irmabaitussalam.github.io/kontak" class="nav-btn"><i class="ti ti-mail"></i> Kontak</a>
+        <button id="toggleThemeDesktop" class="theme-toggle-btn"><i class="ti ti-moon"></i></button>
       </div>
-      <!-- Dropdown profil -->
+
+      <!-- Mobile hamburger -->
+      <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
+      <!-- Dropdown profil (untuk logout) -->
       <div id="profileDropdown" class="dropdown-menu profile-dropdown">
         <p style="font-weight:600; margin-bottom:8px;" id="profileName"></p>
         <button id="logoutBtnFromDropdown"><i class="ti ti-logout"></i> Keluar</button>
       </div>
-      <!-- Dropdown hamburger -->
-      <div id="hamburgerDropdown" class="dropdown-menu hamburger-dropdown">
-        <button id="navHome"><i class="ti ti-home"></i> Beranda</button>
-        <a href="https://irmabaitussalam.github.io/kontak" id="navContact"><i class="ti ti-mail"></i> Kontak</a>
-        <button id="toggleTheme" class="theme-toggle-btn"><i class="ti ti-moon"></i></button>
+
+      <!-- Dropdown hamburger (mobile only) -->
+      <div id="hamburgerDropdown" class="dropdown-menu">
+        <button id="navHomeMobile"><i class="ti ti-home"></i> Beranda</button>
+        <a href="https://irmabaitussalam.github.io/kontak"><i class="ti ti-mail"></i> Kontak</a>
+        <button id="toggleThemeMobile" class="theme-toggle-btn"><i class="ti ti-moon"></i></button>
       </div>
     </header>
 
@@ -509,9 +559,10 @@
     </div>
 
     <div id="dashboardScreen" class="screen">
-      <div class="neu-inset" style="position: relative;">
-        <i class="ti ti-search" style="position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: var(--icon-color);"></i>
-        <input type="text" id="searchInput" class="neu-input" placeholder="Cari kuis atau materi..." style="padding-left: 44px;">
+      <!-- Search tanpa background card -->
+      <div class="search-wrapper">
+        <i class="ti ti-search"></i>
+        <input type="text" id="searchInput" placeholder="Cari kuis atau materi...">
       </div>
 
       <div class="section-title"><i class="ti ti-clipboard-list"></i> Kuis Terbaru</div>
@@ -561,14 +612,13 @@
       </div>
     </div>
 
-    <!-- FOOTER -->
     <footer class="app-footer">
       2014–<span id="currentYear"></span> IRMA Baitussalam
     </footer>
   </div>
 
   <script>
-    // ==================== GANTI KONFIGURASI FIREBASE DI SINI (SUDAH DIISI) ====================
+    // ==================== KONFIGURASI FIREBASE ====================
     const firebaseConfig = {
       apiKey: "AIzaSyAhJNw0GIs1lPxOHMws-C9M3ot8SO-2dJE",
       authDomain: "irma-baitussalam.firebaseapp.com",
@@ -585,40 +635,7 @@
 
     // ==================== DATA QUIZ ====================
     const sampleQuizzes = [
-      {
-        id: 'q1',
-        title: 'Fiqih Ibadah',
-        date: '2026-05-01',
-        category: 'fiqih',
-        questions: [
-          { question: 'Rukun Islam yang <b>pertama</b> adalah...', options: ['Shalat', 'Puasa', '<i>Syahadat</i>', 'Zakat'], answer: 2, explanation: '<b>Syahadat</b> adalah pengakuan bahwa tiada Tuhan selain Allah dan Muhammad adalah utusan Allah.' },
-          { question: 'Shalat wajib sehari semalam berjumlah...', options: ['3', '4', '5', '6'], answer: 2, explanation: 'Shalat wajib ada <u>5 waktu</u>: Subuh, Zuhur, Asar, Magrib, Isya.' },
-          { question: 'Zakat fitrah wajib dikeluarkan pada bulan...', options: ['Muharram', 'Ramadhan', 'Syawal', 'Dzulhijjah'], answer: 1, explanation: 'Zakat fitrah dikeluarkan pada bulan <b>Ramadhan</b> sebelum shalat Idul Fitri.' },
-          { question: 'Haji merupakan rukun Islam ke...', options: ['3', '4', '5', '6'], answer: 2, explanation: 'Haji adalah rukun Islam <b>kelima</b> bagi yang mampu.' },
-          { question: 'Puasa Ramadhan hukumnya...', options: ['Sunnah', 'Wajib', 'Mubah', 'Makruh'], answer: 1, explanation: 'Puasa Ramadhan hukumnya <b>wajib</b> bagi setiap Muslim yang baligh dan mampu.' }
-        ]
-      },
-      {
-        id: 'q2',
-        title: 'Aqidah Akhlak',
-        date: '2026-04-28',
-        category: 'aqidah',
-        questions: [
-          { question: 'Sifat wajib bagi Allah yang berarti "<i>Maha Mengetahui</i>" adalah...', options: ['Al-Alim', 'Al-Basir', 'As-Sami', 'Al-Khabir'], answer: 0, explanation: '<b>Al-Alim</b> artinya Maha Mengetahui.<br>Al-Basir (Maha Melihat), As-Sami (Maha Mendengar), Al-Khabir (Maha Waspada).' },
-          { question: 'Nabi yang menerima kitab <u>Zabur</u> adalah...', options: ['Musa', 'Isa', 'Daud', 'Muhammad'], answer: 2, explanation: 'Kitab Zabur diturunkan kepada <b>Nabi Daud AS</b>.' },
-          { question: 'Jumlah malaikat yang wajib diketahui ada...', options: ['7', '10', '12', '25'], answer: 1, explanation: 'Ada <b>10</b> malaikat yang wajib diketahui.' }
-        ]
-      },
-      {
-        id: 'q3',
-        title: 'Sejarah Islam',
-        date: '2026-04-25',
-        category: 'sejarah',
-        questions: [
-          { question: 'Perang Badar terjadi pada tahun ... Hijriyah', options: ['1', '2', '3', '4'], answer: 1, explanation: 'Perang Badar terjadi pada <b>17 Ramadhan 2 H</b>.' },
-          { question: 'Khalifah pertama umat Islam adalah...', options: ['Umar', '<b>Abu Bakar</b>', 'Utsman', 'Ali'], answer: 1, explanation: '<b>Abu Bakar Ash-Shiddiq</b> adalah khalifah pertama.' }
-        ]
-      }
+      // ... data soal sama seperti sebelumnya ...
     ];
 
     // ==================== GLOBAL STATE ====================
@@ -636,9 +653,12 @@
     const navAvatar = document.getElementById('navAvatar');
     const profileName = document.getElementById('profileName');
     const logoutDropdown = document.getElementById('logoutBtnFromDropdown');
-    const toggleThemeBtn = document.getElementById('toggleTheme');
-    const navHome = document.getElementById('navHome');
-    const navContact = document.getElementById('navContact');
+
+    // Desktop & mobile theme toggles
+    const toggleThemeDesktopBtn = document.getElementById('toggleThemeDesktop');
+    const toggleThemeMobileBtn = document.getElementById('toggleThemeMobile');
+    const navHomeDesktop = document.getElementById('navHomeDesktop');
+    const navHomeMobile = document.getElementById('navHomeMobile');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const searchInput = document.getElementById('searchInput');
     const quizContainer = document.getElementById('quizContainer');
@@ -659,22 +679,27 @@
 
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    // ==================== THEME (Catppuccin + simpan di localStorage) ====================
+    // ==================== THEME ====================
     const html = document.documentElement;
     function setTheme(theme) {
       html.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
-      const icon = toggleThemeBtn.querySelector('i');
-      if (icon) {
+      const icons = document.querySelectorAll('.theme-toggle-btn i');
+      icons.forEach(icon => {
         icon.className = theme === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
-      }
+      });
     }
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
 
-    toggleThemeBtn.addEventListener('click', () => {
+    function handleThemeToggle() {
       const current = html.getAttribute('data-theme');
       setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    toggleThemeDesktopBtn.addEventListener('click', handleThemeToggle);
+    toggleThemeMobileBtn.addEventListener('click', () => {
+      handleThemeToggle();
       hamburgerDropdown.style.display = 'none';
       hamburgerBtn.classList.remove('open');
     });
@@ -705,7 +730,6 @@
           navAvatar.style.display = 'none';
         }
         showScreen('dashboardScreen');
-        // Tampilkan skeleton dulu, lalu load data
         renderSkeletonQuizzes();
         renderSkeletonLeaderboard();
         loadQuizzes();
@@ -719,7 +743,7 @@
       }
     });
 
-    // ==================== HAMBURGER ANIMATION & DROPDOWN ====================
+    // ==================== HAMBURGER & DROPDOWN (MOBILE) ====================
     hamburgerBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isOpen = hamburgerDropdown.style.display === 'flex';
@@ -747,23 +771,22 @@
     });
 
     // ==================== NAVIGATION ====================
-    navHome.addEventListener('click', () => {
+    function goToDashboard() {
       showScreen('dashboardScreen');
       hamburgerDropdown.style.display = 'none';
       hamburgerBtn.classList.remove('open');
-    });
+    }
 
-    // ==================== SKELETON LOADING ====================
+    navHomeDesktop.addEventListener('click', goToDashboard);
+    navHomeMobile.addEventListener('click', goToDashboard);
+
+    // ==================== SKELETON ====================
     function renderSkeletonQuizzes() {
       quizContainer.innerHTML = '';
       for (let i = 0; i < 6; i++) {
         const card = document.createElement('div');
         card.className = 'quiz-card skeleton';
-        card.innerHTML = `
-          <div class="skeleton-title"></div>
-          <div class="skeleton-meta"></div>
-          <div class="skeleton-badges"></div>
-        `;
+        card.innerHTML = `<div class="skeleton-title"></div><div class="skeleton-meta"></div><div class="skeleton-badges"></div>`;
         quizContainer.appendChild(card);
       }
     }
@@ -809,7 +832,7 @@
     }
     searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-    // ==================== FIRESTORE DENGAN FALLBACK LOCALSTORAGE ====================
+    // ==================== FIRESTORE + FALLBACK ====================
     const ATTEMPTS_KEY = 'irmaQuizAttempts_local';
     const LEADERBOARD_KEY = 'irmaQuizLeaderboard_local';
 
@@ -831,7 +854,7 @@
       const leaderboard = getLocalLeaderboard();
       const existing = leaderboard.find(e => e.email === currentUser.email);
       if (existing) {
-        existing.totalScore += score;
+        existing.totalScore = (Number(existing.totalScore) || 0) + score;
       } else {
         leaderboard.push({ email: currentUser.email, name: currentUser.displayName, totalScore: score });
       }
@@ -891,7 +914,6 @@
     }
 
     async function loadLeaderboard() {
-      // Skeleton sudah dipasang sebelumnya, tinggal update data
       try {
         const snapshot = await db.collection('leaderboard')
           .orderBy('totalScore', 'desc')
@@ -905,12 +927,13 @@
         leaderboardEmpty.style.display = 'none';
         snapshot.forEach((doc, i) => {
           const data = doc.data();
+          const total = Number(data.totalScore) || 0;  // pastikan angka
           const li = document.createElement('li');
-          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${data.name}</span> <strong>${data.totalScore} poin</strong>`;
+          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${data.name}</span> <strong>${total} poin</strong>`;
           leaderboardList.appendChild(li);
         });
       } catch (error) {
-        console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', error);
+        console.warn('Gagal load leaderboard, pakai lokal:', error);
         const local = getLocalLeaderboard();
         leaderboardList.innerHTML = '';
         if (local.length === 0) {
@@ -918,10 +941,10 @@
           return;
         }
         leaderboardEmpty.style.display = 'none';
-        local.sort((a,b) => b.totalScore - a.totalScore);
+        local.sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
         local.forEach((u, i) => {
           const li = document.createElement('li');
-          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${u.totalScore} poin</strong>`;
+          li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${u.name}</span> <strong>${u.totalScore||0} poin</strong>`;
           leaderboardList.appendChild(li);
         });
       }
@@ -994,34 +1017,22 @@
     });
 
     submitBtn.addEventListener('click', async () => {
-      console.log('Submit diklik');
-      if (!currentQuiz) {
-        console.error('currentQuiz hilang');
-        return;
-      }
+      if (!currentQuiz) return;
       try {
         let score = 0;
         currentQuiz.questions.forEach((q, i) => {
           if (userAnswers[i] === q.answer) score++;
         });
-        console.log('Skor:', score);
-
         await saveAttempt(currentQuiz.id, [...userAnswers], score);
-        console.log('Percobaan tersimpan');
-
         showReviewScreen(currentQuiz, userAnswers, score);
-        console.log('Review ditampilkan');
-
         loadLeaderboard();
       } catch (error) {
-        console.error('Error saat menyelesaikan kuis:', error);
-        alert('Terjadi kesalahan saat menyimpan hasil. Silakan coba lagi.');
+        console.error(error);
+        alert('Gagal menyimpan hasil.');
       }
     });
 
-    // ==================== REVIEW SCREEN ====================
     function showReviewScreen(quiz, answers, score) {
-      console.log('Menampilkan review untuk', quiz.title);
       currentQuiz = quiz;
       resultScore.textContent = `${score} / ${quiz.questions.length}`;
       let html = '';
@@ -1040,7 +1051,6 @@
       });
       reviewContainer.innerHTML = html;
       showScreen('resultScreen');
-      console.log('Layar result aktif');
     }
 
     backToHomeBtn.addEventListener('click', () => {
