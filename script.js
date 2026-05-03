@@ -199,16 +199,28 @@ async function handleQuizClick(quiz) {
   const att=await getUserAttempt(quiz.id);
   att ? showReviewScreen(quiz,att.answers,att.score) : startQuiz(quiz);
 }
-function startQuiz(quiz) { currentQuiz=quiz; currentQuestionIndex=0; userAnswers=new Array(quiz.questions.length).fill(null); showScreen('quizScreen'); renderQuestion(); }
-
-// Handler tombol navigasi
-function prevHandler() {
-  if (currentQuestionIndex === 0) { goHome(); return; } // kembali ke beranda di soal pertama
-  if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestion(); }
+function startQuiz(quiz) {
+  currentQuiz = quiz;
+  currentQuestionIndex = 0;
+  userAnswers = new Array(quiz.questions.length).fill(null);
+  showScreen('quizScreen');
+  renderQuestion();
 }
-function nextHandler() {
-  if (!currentQuiz) return;
-  if (currentQuestionIndex < currentQuiz.questions.length - 1) { currentQuestionIndex++; renderQuestion(); }
+
+// Handler sederhana
+function prevAction() {
+  if (currentQuestionIndex === 0) {
+    goHome();
+  } else {
+    currentQuestionIndex--;
+    renderQuestion();
+  }
+}
+function nextAction() {
+  if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+    currentQuestionIndex++;
+    renderQuestion();
+  }
 }
 
 function renderQuestion() {
