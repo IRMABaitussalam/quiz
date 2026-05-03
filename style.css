@@ -298,30 +298,36 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .app-footer { margin-top:auto; text-align:center; padding:20px; font-size:0.85rem; color:var(--subtext1); border-top:1px solid var(--overlay0); }
 .screen {
   display: none;
-  flex: 1;
-  overflow-y: auto;           /* konten panjang bisa di-scroll, footer tetap di bawah */
-  padding-bottom: 20px;       /* ruang nyaman sebelum footer */
-  box-sizing: border-box;
-}
-.screen.active {
-  display: flex;
-  flex-direction: column;     /* agar konten bisa diatur dengan flex jika perlu */
-}
-/* Untuk layar hasil yang review-nya panjang, pastikan scroll bekerja */
-#resultScreen .neu-card {
-  max-height: calc(100vh - 200px); /* opsional, batasi tinggi maksimum card */
-  overflow-y: auto;               /* jika konten melebihi, bisa di-scroll di dalam card */
 }
 
-#quizScreen.active {
+.screen.active {
   display: flex;
   flex-direction: column;
+  flex: 1;                   /* biarkan mengambil sisa tinggi di wrapper */
+  padding-bottom: 24px;      /* jarak aman sebelum footer */
 }
-#quizCard {
+#resultScreen .neu-card {
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   flex: 1;
+}
+
+#reviewContainer {
+  max-height: 55vh;          /* batasi tinggi review area */
+  overflow-y: auto;          /* scroll internal jika konten panjang */
+  padding: 12px;             /* ruang ekstra untuk shadow */
+  margin: -12px;             /* kompensasi padding agar shadow tidak terpotong */
+}
+
+#quizScreen .neu-card {
+  flex: 1;                   /* card mengisi ruang yang ada */
   display: flex;
   flex-direction: column;
 }
+
 /* Skeleton */
 .skeleton .skeleton-title, .skeleton .skeleton-meta, .skeleton .skeleton-badges {
   background: linear-gradient(90deg, var(--surface1) 25%, var(--surface0) 50%, var(--surface1) 75%);
