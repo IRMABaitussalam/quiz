@@ -99,6 +99,47 @@ if (logoutBtn) {
   logoutBtn.addEventListener('click', () => auth.signOut());
 }
 
+// ==================== PROTEKSI ====================
+let isProtected = false;
+
+function enableProtection() {
+  if (isProtected) return;
+  isProtected = true;
+
+  // 1. Cegah copy, cut, paste
+  document.addEventListener('copy', (e) => { e.preventDefault(); });
+  document.addEventListener('cut', (e) => { e.preventDefault(); });
+  document.addEventListener('paste', (e) => { e.preventDefault(); });
+
+  // 2. Cegah klik kanan pada gambar (avatar)
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+
+  // 3. Cegah drag gambar
+  document.addEventListener('dragstart', (e) => {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  });
+
+  // 4. Overlay blur saat halaman tidak fokus
+  const focusOverlay = document.getElementById('focusOverlay');
+  if (!focusOverlay) return;
+  document.addEventListener('visibilitychange', () => {
+    // Hanya aktif jika bukan di login screen
+    const activeScreen = document.querySelector('.screen.active');
+    if (activeScreen && activeScreen.id === 'loginScreen') return;
+    if (document.hidden) {
+      focusOverlay.style.display = 'flex';
+    } else {
+      focusOverlay.style.display = 'none';
+    }
+  });
+}
+
 auth.onAuthStateChanged(user => {
   const loader = $('loadingScreen');
   if (loader) {
@@ -115,6 +156,7 @@ auth.onAuthStateChanged(user => {
     showScreen('dashboardScreen');
     renderSkeletonQuizzes(); renderSkeletonLeaderboard();
     loadQuizzes(); loadLeaderboard(); checkHash();
+    enableProtection();
   } else {
     currentUser = null;
     showScreen('loginScreen');

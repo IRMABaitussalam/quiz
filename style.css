@@ -409,3 +409,41 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .stat-value {
   font-weight: 600;
 }
+
+/* ===== PROTEKSI ===== */
+/* Cegah seleksi teks di seluruh body, kecuali input */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Overlay blur saat tidak fokus */
+.focus-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(20px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  pointer-events: all;    /* menutup interaksi di bawahnya */
+}
+.focus-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.9;
+}
