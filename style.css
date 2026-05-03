@@ -284,7 +284,14 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   transform: scale(0.98);
 }
 
-.back-home-btn { width: auto; height: auto; margin: 20px auto 0; padding: 12px 24px; border-radius: 30px; color: var(--text); }
+.back-home-btn {
+  width: auto;
+  height: auto;
+  margin: 20px auto 24px;   /* atas 20px, bawah 24px – memberi ruang seimbang */
+  padding: 12px 24px;
+  border-radius: 30px;
+  color: var(--text);
+}
 .back-home-btn:hover { box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color); }
 
 .login-card { max-width:400px; margin:60px auto; text-align:center; }
