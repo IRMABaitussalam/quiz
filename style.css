@@ -287,10 +287,13 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .back-home-btn {
   width: auto;
   height: auto;
-  margin: 20px auto 24px;   /* atas 20px, bawah 24px – memberi ruang seimbang */
+  margin: 24px auto 0;   /* atas 24px, kiri/kanan auto */
   padding: 12px 24px;
   border-radius: 30px;
   color: var(--text);
+  background: var(--surface0);
+  box-shadow: 4px 4px 8px var(--shadow-color), -4px -4px 8px var(--highlight-color);
+  transition: all 0.2s;
 }
 .back-home-btn:hover { box-shadow: inset 3px 3px 6px var(--shadow-color), inset -3px -3px 6px var(--highlight-color); }
 
@@ -327,6 +330,7 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   overflow-y: auto;          /* scroll internal jika konten panjang */
   padding: 12px;             /* ruang ekstra untuk shadow */
   margin: -12px;             /* kompensasi padding agar shadow tidak terpotong */
+  margin-bottom: 20px;   /* tambahan jarak aman */
 }
 
 #quizScreen .neu-card {
