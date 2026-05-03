@@ -23,11 +23,12 @@
     <div id="confirmModal" class="modal-overlay" style="display:none;">
       <div class="modal-card neu-card">
         <h2>Mulai Kuis?</h2>
-        <p style="margin-bottom:12px;">Kuis ini akan berisi <strong id="confirmQuizName"></strong> (<span id="confirmQuestionCount"></span> soal).</p>
-        <p style="font-size:0.9rem; margin-bottom:12px;">
-          Skor maksimum <strong id="confirmMaxScore"></strong>, minimum <strong id="confirmMinScore"></strong>.
-          Setiap <span id="confirmStep"></span> detik skor berkurang hingga batas minimum.
-        </p>
+        <p style="margin-bottom:12px;">Kuis <strong id="confirmQuizName"></strong> (<span id="confirmQuestionCount"></span> soal)</p>
+        <div style="font-size:0.9rem; margin-bottom:8px;">
+          <p>Skor per soal: <strong id="confirmScoreRange"></strong></p>
+          <p>Waktu tiap soal: <strong id="confirmTimeRange"></strong></p>
+          <p>Pengurangan setiap: <strong id="confirmStepRange"></strong></p>
+        </div>
         <p><a href="ketentuan.html" target="_blank" style="color:var(--blue);">Baca ketentuan lengkap</a></p>
         <div style="margin-top:16px; display:flex; gap:10px;">
           <button id="startQuizConfirmBtn" class="nav-btn">Mulai Kuis</button>

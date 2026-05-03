@@ -12,16 +12,18 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// ---------- STATE ----------
 let currentUser = null;
-let currentQuiz = null;           // objek kuis lengkap (dengan questions yang sudah diacak)
+let currentQuiz = null;
 let currentQuestionIndex = 0;
-let userResponses = [];           // { answerIndex, timeElapsed }
-let questionAnswered = [];        // boolean per soal
+let userResponses = [];          // { answerIndex, timeElapsed }
+let questionAnswered = [];       // boolean per soal
 let timerSeconds = 0;
 let timerInterval = null;
-let sampleQuizzes = [];           // data mentah dari file quiz
-let pendingQuizId = null;        // id kuis yang akan dimulai setelah konfirmasi
+let sampleQuizzes = [];
+let pendingQuizId = null;
 
+// ---------- DOM ----------
 const $ = (id) => document.getElementById(id);
 const mainNavbar = $('mainNavbar');
 const profileTrigger = $('profileTrigger');
@@ -54,38 +56,48 @@ const statModal = $('statModal');
 const statContent = $('statContent');
 const closeStatModal = $('closeStatModal');
 
-// Elemen modal konfirmasi
+// Modal konfirmasi & countdown
 const confirmModal = $('confirmModal');
 const confirmQuizName = $('confirmQuizName');
 const confirmQuestionCount = $('confirmQuestionCount');
-const confirmMaxScore = $('confirmMaxScore');
-const confirmMinScore = $('confirmMinScore');
-const confirmStep = $('confirmStep');
+const confirmScoreRange = $('confirmScoreRange');
+const confirmTimeRange = $('confirmTimeRange');
+const confirmStepRange = $('confirmStepRange');
 const startQuizConfirmBtn = $('startQuizConfirmBtn');
 const cancelQuizConfirmBtn = $('cancelQuizConfirmBtn');
 const countdownModal = $('countdownModal');
 const countdownTimerText = $('countdownTimerText');
 
-$('currentYear').textContent = new Date().getFullYear();
+// Footer tahun
+if ($('currentYear')) $('currentYear').textContent = new Date().getFullYear();
 
 // Sembunyikan semua screen, tampilkan loading
 ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(id => {
   const el = $(id);
   if (el) el.classList.remove('active');
 });
-$('loadingScreen').style.display = 'flex';
+if ($('loadingScreen')) $('loadingScreen').style.display = 'flex';
 
+// ---------- SCREEN ----------
 function showScreen(id) {
-  ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(s => $(s).classList.remove('active'));
-  const el = $(id); if (el) el.classList.add('active');
+  ['loginScreen','dashboardScreen','quizScreen','resultScreen'].forEach(s => {
+    const el = $(s);
+    if (el) el.classList.remove('active');
+  });
+  const el = $(id);
+  if (el) el.classList.add('active');
   if (mainNavbar) mainNavbar.style.display = (id === 'loginScreen') ? 'none' : 'flex';
 }
 
-// Auth
-googleLoginBtn.addEventListener('click', () => {
-  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('Login gagal: ' + e.message));
-});
-logoutBtn.addEventListener('click', () => auth.signOut());
+// ---------- AUTH ----------
+if (googleLoginBtn) {
+  googleLoginBtn.addEventListener('click', () => {
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert('Login gagal: ' + e.message));
+  });
+}
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => auth.signOut());
+}
 
 auth.onAuthStateChanged(user => {
   const loader = $('loadingScreen');
@@ -95,38 +107,44 @@ auth.onAuthStateChanged(user => {
   }
   if (user) {
     currentUser = { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL };
-    profileName.textContent = user.displayName || 'Peserta';
-    if (user.photoURL) { navAvatar.src = user.photoURL; navAvatar.style.display = 'inline-block'; }
-    else { navAvatar.style.display = 'none'; }
+    if (profileName) profileName.textContent = user.displayName || 'Peserta';
+    if (navAvatar) {
+      if (user.photoURL) { navAvatar.src = user.photoURL; navAvatar.style.display = 'inline-block'; }
+      else navAvatar.style.display = 'none';
+    }
     showScreen('dashboardScreen');
     renderSkeletonQuizzes(); renderSkeletonLeaderboard();
     loadQuizzes(); loadLeaderboard(); checkHash();
   } else {
     currentUser = null;
     showScreen('loginScreen');
-    profileDropdown.style.display = 'none';
-    hamburgerDropdown.style.display = 'none';
+    if (profileDropdown) profileDropdown.style.display = 'none';
+    if (hamburgerDropdown) hamburgerDropdown.style.display = 'none';
     if (hamburgerBtn) hamburgerBtn.classList.remove('open');
   }
 });
 
-// Dropdown & hamburger
-profileTrigger.addEventListener('click', (e) => {
-  e.stopPropagation();
-  profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
-  hamburgerDropdown.style.display = 'none';
-  if (hamburgerBtn) hamburgerBtn.classList.remove('open');
-});
-hamburgerBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  const isOpen = hamburgerDropdown.style.display === 'flex';
-  hamburgerDropdown.style.display = isOpen ? 'none' : 'flex';
-  hamburgerBtn.classList.toggle('open', !isOpen);
-  profileDropdown.style.display = 'none';
-});
+// ---------- DROPDOWN & HAMBURGER ----------
+if (profileTrigger) {
+  profileTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (profileDropdown) profileDropdown.style.display = profileDropdown.style.display === 'flex' ? 'none' : 'flex';
+    if (hamburgerDropdown) hamburgerDropdown.style.display = 'none';
+    if (hamburgerBtn) hamburgerBtn.classList.remove('open');
+  });
+}
+if (hamburgerBtn) {
+  hamburgerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = hamburgerDropdown && hamburgerDropdown.style.display === 'flex';
+    if (hamburgerDropdown) hamburgerDropdown.style.display = isOpen ? 'none' : 'flex';
+    if (hamburgerBtn) hamburgerBtn.classList.toggle('open', !isOpen);
+    if (profileDropdown) profileDropdown.style.display = 'none';
+  });
+}
 document.addEventListener('click', () => {
-  profileDropdown.style.display = 'none';
-  hamburgerDropdown.style.display = 'none';
+  if (profileDropdown) profileDropdown.style.display = 'none';
+  if (hamburgerDropdown) hamburgerDropdown.style.display = 'none';
   if (hamburgerBtn) hamburgerBtn.classList.remove('open');
 });
 
@@ -136,10 +154,10 @@ function goHome() {
   if (hamburgerDropdown) hamburgerDropdown.style.display = 'none';
   if (hamburgerBtn) hamburgerBtn.classList.remove('open');
 }
-navHomeDesktop.addEventListener('click', goHome);
-navHomeMobile.addEventListener('click', goHome);
+if (navHomeDesktop) navHomeDesktop.addEventListener('click', goHome);
+if (navHomeMobile) navHomeMobile.addEventListener('click', goHome);
 
-// Hash routing
+// ---------- HASH ROUTING ----------
 function slugify(text) {
   return text.toLowerCase().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').replace(/^-+|-+$/g,'');
 }
@@ -153,8 +171,9 @@ function checkHash() {
 window.addEventListener('hashchange', checkHash);
 function navigateToQuiz(quiz) { window.location.hash = '#/' + slugify(quiz.title); }
 
-// Skeleton
+// ---------- SKELETON ----------
 function renderSkeletonQuizzes() {
+  if (!quizContainer) return;
   quizContainer.innerHTML = '';
   for (let i=0;i<6;i++) {
     const c = document.createElement('div');
@@ -164,8 +183,9 @@ function renderSkeletonQuizzes() {
   }
 }
 function renderSkeletonLeaderboard() {
+  if (!leaderboardList) return;
   leaderboardList.innerHTML = '';
-  leaderboardEmpty.style.display = 'none';
+  if (leaderboardEmpty) leaderboardEmpty.style.display = 'none';
   for (let i=0;i<5;i++) {
     const li = document.createElement('li');
     li.innerHTML = '<div class="skeleton-leaderboard"></div>';
@@ -173,8 +193,9 @@ function renderSkeletonLeaderboard() {
   }
 }
 
-// Render quiz list dengan deskripsi
+// ---------- QUIZ LIST ----------
 function renderQuizzes(quizzes) {
+  if (!quizContainer) return;
   quizContainer.innerHTML = '';
   if (!quizzes.length) {
     quizContainer.innerHTML = '<p class="empty-message">Belum ada kuis</p>';
@@ -204,9 +225,9 @@ function loadQuizzes(filter='') {
   }
   renderQuizzes(list);
 }
-searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
+if (searchInput) searchInput.addEventListener('input', e => loadQuizzes(e.target.value));
 
-// Firestore + localStorage
+// ---------- FIRESTORE & LOCAL ----------
 const ATTEMPTS_KEY = 'irmaQuizAttempts_local';
 const LEADERBOARD_KEY = 'irmaQuizLeaderboard_local';
 
@@ -218,7 +239,7 @@ function saveLocalAttempt(qid, responses, score, shuffledQuestions) {
   const correctCount = responses.filter((r, i) => r && r.answerIndex === shuffledQuestions[i].answer).length;
   const totalTime = responses.reduce((sum, r) => sum + (r?.timeElapsed || 0), 0);
   a[currentUser.email][qid] = {
-    shuffledQuestions,   // simpan soal yang sudah diacak
+    shuffledQuestions,
     responses,
     score,
     correctCount,
@@ -259,7 +280,6 @@ async function getUserAttempt(qid) {
     if (d.exists) {
       const data = d.data();
       data.score = safeNum(data.score);
-      // Pastikan shuffledQuestions ada, jika tidak gunakan array kosong
       if (!data.shuffledQuestions) data.shuffledQuestions = [];
       return data;
     }
@@ -304,64 +324,46 @@ async function addToLeaderboard(score) {
     const ref = db.collection('leaderboard').doc(currentUser.uid);
     const doc = await ref.get();
     if (doc.exists) {
-      await ref.update({
-        totalScore: firebase.firestore.FieldValue.increment(score)
-      });
+      await ref.update({ totalScore: firebase.firestore.FieldValue.increment(score) });
     } else {
-      await ref.set({
-        uid: currentUser.uid,
-        name: displayName,
-        totalScore: score
-      });
+      await ref.set({ uid: currentUser.uid, name: displayName, totalScore: score });
     }
-  } catch (e) {
-    throw e;
-  }
+  } catch (e) { throw e; }
 }
 
 async function loadLeaderboard() {
+  if (!leaderboardList) return;
   try {
-    const snapshot = await db.collection('leaderboard')
-      .orderBy('totalScore', 'desc')
-      .limit(20)
-      .get();
+    const snapshot = await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get();
     const leaderboardArray = [];
     snapshot.forEach(doc => {
       const data = doc.data();
-      leaderboardArray.push({
-        uid: doc.id,
-        name: cleanName(data.name),
-        score: safeNum(data.totalScore)
-      });
+      leaderboardArray.push({ uid: doc.id, name: cleanName(data.name), score: safeNum(data.totalScore) });
     });
     renderLeaderboardArray(leaderboardArray);
   } catch (e) {
-    console.warn('Gagal memuat leaderboard Firestore, gunakan lokal:', e);
+    console.warn('Fallback leaderboard lokal');
     const local = getLocalLeaderboard();
-    const cleaned = local.map(u => ({
-      uid: u.uid || u.email,
-      name: cleanName(u.name),
-      score: safeNum(u.totalScore)
-    }));
-    cleaned.sort((a, b) => b.score - a.score);
+    const cleaned = local.map(u => ({ uid: u.uid || u.email, name: cleanName(u.name), score: safeNum(u.totalScore) }));
+    cleaned.sort((a,b) => b.score - a.score);
     renderLeaderboardArray(cleaned);
   }
 }
 
 function renderLeaderboardArray(arr) {
+  if (!leaderboardList) return;
   leaderboardList.innerHTML = '';
   if (!arr.length) {
-    leaderboardEmpty.style.display = 'block';
+    if (leaderboardEmpty) leaderboardEmpty.style.display = 'block';
     return;
   }
-  leaderboardEmpty.style.display = 'none';
+  if (leaderboardEmpty) leaderboardEmpty.style.display = 'none';
   arr.forEach((item, i) => {
-    const rank = i + 1;
+    const rank = i+1;
     let rankDisplay = `<span class="rank-number">${rank}.</span>`;
     if (rank === 1) rankDisplay = `<span class="rank-number">🥇</span>`;
     else if (rank === 2) rankDisplay = `<span class="rank-number">🥈</span>`;
     else if (rank === 3) rankDisplay = `<span class="rank-number">🥉</span>`;
-
     const li = document.createElement('li');
     li.innerHTML = `
       ${rankDisplay}
@@ -382,18 +384,12 @@ function renderLeaderboardArray(arr) {
 }
 
 async function showUserStats(uid) {
+  if (!statContent || !statModal) return;
   statContent.innerHTML = 'Memuat...';
   statModal.style.display = 'flex';
   try {
-    const attemptsSnap = await db.collection('attempts')
-      .where('uid', '==', uid)
-      .get();
-
-    let totalCorrect = 0;
-    let totalQuestions = 0;
-    let totalTime = 0;
-    let totalScore = 0;
-
+    const attemptsSnap = await db.collection('attempts').where('uid','==',uid).get();
+    let totalCorrect=0, totalQuestions=0, totalTime=0, totalScore=0;
     attemptsSnap.forEach(doc => {
       const d = doc.data();
       if (d.correctCount !== undefined) {
@@ -401,34 +397,24 @@ async function showUserStats(uid) {
         totalQuestions += d.totalQuestions || 0;
         totalTime += d.totalTime || 0;
       } else if (d.responses) {
-        const timeSum = (d.responses || []).reduce((s, r) => s + (r?.timeElapsed || 0), 0);
-        totalTime += timeSum;
+        totalTime += (d.responses || []).reduce((s,r) => s + (r?.timeElapsed || 0), 0);
         totalQuestions += (d.responses || []).length;
       }
       totalScore += d.score || 0;
     });
-
-    if (totalQuestions === 0) {
-      statContent.innerHTML = '<p>Tidak ada data kuis.</p>';
-      return;
-    }
-
+    if (totalQuestions === 0) { statContent.innerHTML = '<p>Tidak ada data kuis.</p>'; return; }
     const totalWrong = totalQuestions - totalCorrect;
-    const avgTime = totalQuestions ? (totalTime / totalQuestions).toFixed(1) : 0;
-    const correctRate = totalQuestions ? ((totalCorrect / totalQuestions) * 100).toFixed(1) : 0;
-    const wrongRate = totalQuestions ? ((totalWrong / totalQuestions) * 100).toFixed(1) : 0;
-
+    const avgTime = (totalTime / totalQuestions).toFixed(1);
+    const correctRate = ((totalCorrect / totalQuestions)*100).toFixed(1);
+    const wrongRate = ((totalWrong / totalQuestions)*100).toFixed(1);
     let userRank = '-';
     try {
-      const leaderSnapshot = await db.collection('leaderboard')
-        .orderBy('totalScore', 'desc')
-        .get();
+      const leaderSnap = await db.collection('leaderboard').orderBy('totalScore','desc').get();
       const list = [];
-      leaderSnapshot.forEach(doc => list.push({ uid: doc.id, ...doc.data() }));
+      leaderSnap.forEach(doc => list.push({ uid: doc.id, ...doc.data() }));
       const idx = list.findIndex(u => u.uid === uid);
-      if (idx >= 0) userRank = idx + 1;
-    } catch (e) { console.warn(e); }
-
+      if (idx >= 0) userRank = idx+1;
+    } catch (e) {}
     statContent.innerHTML = `
       <div class="stat-row"><span class="stat-label">Ranking</span><span class="stat-value">${userRank}</span></div>
       <div class="stat-row"><span class="stat-label">Total Poin</span><span class="stat-value">${totalScore}</span></div>
@@ -439,94 +425,92 @@ async function showUserStats(uid) {
       <div class="stat-row"><span class="stat-label">Peluang Benar (mendatang)</span><span class="stat-value">${correctRate}%</span></div>
       <div class="stat-row"><span class="stat-label">Peluang Salah (mendatang)</span><span class="stat-value">${wrongRate}%</span></div>
     `;
-  } catch (e) {
-    console.error(e);
-    statContent.innerHTML = '<p>Gagal memuat statistik.</p>';
-  }
+  } catch (e) { statContent.innerHTML = '<p>Gagal memuat statistik.</p>'; }
 }
+if (closeStatModal) closeStatModal.addEventListener('click', () => { if (statModal) statModal.style.display = 'none'; });
+if (statModal) window.addEventListener('click', (e) => { if (e.target === statModal) statModal.style.display = 'none'; });
 
-closeStatModal.addEventListener('click', () => {
-  statModal.style.display = 'none';
-});
-window.addEventListener('click', (e) => {
-  if (e.target === statModal) statModal.style.display = 'none';
-});
-
-// ==================== PENGACAKAN ====================
+// ---------- PENGACAKAN ----------
 function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
 
-// ==================== KONFIRMASI & MULAI KUIS ====================
+// ---------- KONFIRMASI & MULAI KUIS ----------
 async function handleQuizClick(quiz) {
   if (!currentUser) return;
   const att = await getUserAttempt(quiz.id);
   if (att) {
-    // Tampilkan review langsung, gunakan soal dan jawaban yang tersimpan
-    showReviewScreen(
-      att.shuffledQuestions && att.shuffledQuestions.length ? att.shuffledQuestions : quiz.questions,
-      att.responses,
-      att.score,
-      true  // mode review (tidak ada timer)
-    );
+    // Review dari attempt tersimpan
+    const questions = att.shuffledQuestions?.length ? att.shuffledQuestions : quiz.questions;
+    showReviewScreen(questions, att.responses, att.score);
     return;
   }
-  // Tampilkan modal konfirmasi
+  // Tampilkan modal konfirmasi dengan rentang
+  if (!confirmModal || !quiz) return;
   pendingQuizId = quiz.id;
   confirmQuizName.textContent = quiz.title;
   confirmQuestionCount.textContent = quiz.questions.length;
-  // ambil salah satu soal untuk contoh max/min score
-  const sampleQ = quiz.questions[0];
-  confirmMaxScore.textContent = sampleQ.maxScore;
-  confirmMinScore.textContent = sampleQ.minScore;
-  confirmStep.textContent = sampleQ.deductionStep;
+
+  const maxScores = quiz.questions.map(q => q.maxScore || 10);
+  const minScores = quiz.questions.map(q => q.minScore || 1);
+  const steps = quiz.questions.map(q => q.deductionStep || 2);
+  const timeLimits = quiz.questions.map(q => q.timeLimit || 30);
+
+  const minScore = Math.min(...minScores);
+  const maxScore = Math.max(...maxScores);
+  const minStep = Math.min(...steps);
+  const maxStep = Math.max(...steps);
+  const minTime = Math.min(...timeLimits);
+  const maxTime = Math.max(...timeLimits);
+
+  let scoreRangeText = `${minScore}–${maxScore} poin`;
+  let stepRangeText = (minStep === maxStep) ? `${minStep} detik` : `${minStep}–${maxStep} detik`;
+  let timeRangeText = (minTime === maxTime) ? `${minTime} detik` : `${minTime}–${maxTime} detik`;
+
+  if (confirmScoreRange) confirmScoreRange.textContent = scoreRangeText;
+  if (confirmTimeRange) confirmTimeRange.textContent = timeRangeText;
+  if (confirmStepRange) confirmStepRange.textContent = stepRangeText;
+
   confirmModal.style.display = 'flex';
 }
 
-startQuizConfirmBtn.addEventListener('click', () => {
-  confirmModal.style.display = 'none';
-  // Tampilkan countdown
-  countdownModal.style.display = 'flex';
-  let count = 5;
-  countdownTimerText.textContent = count;
-  const interval = setInterval(() => {
-    count--;
-    countdownTimerText.textContent = count;
-    if (count <= 0) {
-      clearInterval(interval);
-      countdownModal.style.display = 'none';
-      const quiz = sampleQuizzes.find(q => q.id === pendingQuizId);
-      if (quiz) startQuiz(quiz);
-    }
-  }, 1000);
-});
-
-cancelQuizConfirmBtn.addEventListener('click', () => {
-  confirmModal.style.display = 'none';
-  pendingQuizId = null;
-});
+if (startQuizConfirmBtn) {
+  startQuizConfirmBtn.addEventListener('click', () => {
+    if (confirmModal) confirmModal.style.display = 'none';
+    if (countdownModal) countdownModal.style.display = 'flex';
+    let count = 5;
+    if (countdownTimerText) countdownTimerText.textContent = count;
+    const interval = setInterval(() => {
+      count--;
+      if (countdownTimerText) countdownTimerText.textContent = count;
+      if (count <= 0) {
+        clearInterval(interval);
+        if (countdownModal) countdownModal.style.display = 'none';
+        const quiz = sampleQuizzes.find(q => q.id === pendingQuizId);
+        if (quiz) startQuiz(quiz);
+      }
+    }, 1000);
+  });
+}
+if (cancelQuizConfirmBtn) {
+  cancelQuizConfirmBtn.addEventListener('click', () => {
+    if (confirmModal) confirmModal.style.display = 'none';
+    pendingQuizId = null;
+  });
+}
 
 function startQuiz(quiz) {
-  // Acak soal
   const shuffledQuestions = shuffleArray([...quiz.questions]).map(q => {
     const correctText = q.options[q.answer];
     const shuffledOptions = shuffleArray([...q.options]);
     const newAnswerIndex = shuffledOptions.indexOf(correctText);
-    return {
-      ...q,
-      options: shuffledOptions,
-      answer: newAnswerIndex
-    };
+    return { ...q, options: shuffledOptions, answer: newAnswerIndex };
   });
-  currentQuiz = {
-    ...quiz,
-    questions: shuffledQuestions,
-    originalId: quiz.id   // simpan id asli
-  };
+  currentQuiz = { ...quiz, questions: shuffledQuestions, originalId: quiz.id };
   currentQuestionIndex = 0;
   userResponses = new Array(shuffledQuestions.length).fill(null);
   questionAnswered = new Array(shuffledQuestions.length).fill(false);
@@ -534,26 +518,18 @@ function startQuiz(quiz) {
   renderQuestion();
 }
 
-// ==================== TIMER ====================
-function clearTimer() {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-}
+// ---------- TIMER ----------
+function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function startTimer() {
   clearTimer();
   timerSeconds = 0;
   updateTimerDisplay(timerSeconds);
-  timerInterval = setInterval(() => {
-    timerSeconds++;
-    updateTimerDisplay(timerSeconds);
-  }, 1000);
+  timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(timerSeconds); }, 1000);
 }
 function updateTimerDisplay(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  if (timerText) timerText.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if (!timerText) return;
+  const m = Math.floor(sec/60), s = sec%60;
+  timerText.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
 function selectAnswer(idx) {
@@ -574,22 +550,12 @@ function calculateScore(question, timeElapsed) {
   return Math.max(question.minScore, Math.round(question.maxScore - steps * reduction));
 }
 
-// ==================== NAVIGASI SOAL ====================
 function prevAction() {
-  if (currentQuestionIndex === 0) {
-    goHome(); // tombol rumah "Kembali"
-  } else {
-    clearTimer();
-    currentQuestionIndex--;
-    renderQuestion();
-  }
+  if (currentQuestionIndex === 0) { goHome(); }
+  else { clearTimer(); currentQuestionIndex--; renderQuestion(); }
 }
 function nextAction() {
-  if (currentQuestionIndex < currentQuiz.questions.length - 1) {
-    clearTimer();
-    currentQuestionIndex++;
-    renderQuestion();
-  }
+  if (currentQuestionIndex < currentQuiz.questions.length-1) { clearTimer(); currentQuestionIndex++; renderQuestion(); }
 }
 
 function renderQuestion(skipTimer = false) {
@@ -597,80 +563,80 @@ function renderQuestion(skipTimer = false) {
   clearTimer();
   const qi = currentQuestionIndex;
   const q = currentQuiz.questions[qi];
-  quizTitle.textContent = currentQuiz.title;
-  questionNumber.textContent = `Soal ${qi + 1} dari ${currentQuiz.questions.length}`;
-  questionText.innerHTML = q.question;
-  progressFill.style.width = ((qi + 1) / currentQuiz.questions.length * 100) + '%';
+  if (quizTitle) quizTitle.textContent = currentQuiz.title;
+  if (questionNumber) questionNumber.textContent = `Soal ${qi+1} dari ${currentQuiz.questions.length}`;
+  if (questionText) questionText.innerHTML = q.question;
+  if (progressFill) progressFill.style.width = ((qi+1)/currentQuiz.questions.length*100)+'%';
 
-  if (!questionAnswered[qi] && !skipTimer) {
-    startTimer();
-  } else {
-    const resp = userResponses[qi];
-    updateTimerDisplay(resp ? resp.timeElapsed : 0);
-  }
+  if (!questionAnswered[qi] && !skipTimer) { startTimer(); }
+  else { updateTimerDisplay(userResponses[qi]?.timeElapsed || 0); }
 
-  optionsContainer.innerHTML = '';
-  q.options.forEach((opt, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'quiz-option';
-    if (userResponses[qi]?.answerIndex === idx) btn.classList.add('selected');
-    btn.innerHTML = opt;
-    btn.disabled = questionAnswered[qi];
-    btn.addEventListener('click', () => {
-      if (!questionAnswered[qi]) selectAnswer(idx);
+  if (optionsContainer) {
+    optionsContainer.innerHTML = '';
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      if (userResponses[qi]?.answerIndex === idx) btn.classList.add('selected');
+      btn.innerHTML = opt;
+      btn.disabled = questionAnswered[qi];
+      btn.addEventListener('click', () => { if (!questionAnswered[qi]) selectAnswer(idx); });
+      optionsContainer.appendChild(btn);
     });
-    optionsContainer.appendChild(btn);
-  });
+  }
 
   // Navigasi
   if (qi === 0) {
-    prevBtn.className = 'quiz-nav-btn-text';
-    prevBtn.innerHTML = '<i class="ti ti-home"></i> Kembali';
-    prevBtn.onclick = () => goHome();
-    prevBtn.style.display = 'flex';
+    if (prevBtn) {
+      prevBtn.className = 'quiz-nav-btn-text';
+      prevBtn.innerHTML = '<i class="ti ti-home"></i> Kembali';
+      prevBtn.onclick = () => goHome();
+      prevBtn.style.display = 'flex';
+    }
   } else {
-    prevBtn.className = 'icon-btn quiz-nav-btn';
-    prevBtn.innerHTML = '<i class="ti ti-arrow-left"></i>';
-    prevBtn.onclick = prevAction;
-    prevBtn.style.display = 'flex';
+    if (prevBtn) {
+      prevBtn.className = 'icon-btn quiz-nav-btn';
+      prevBtn.innerHTML = '<i class="ti ti-arrow-left"></i>';
+      prevBtn.onclick = prevAction;
+      prevBtn.style.display = 'flex';
+    }
   }
 
-  if (qi === currentQuiz.questions.length - 1) {
-    nextBtn.style.display = 'none';
-    submitBtn.style.display = 'block';
+  if (qi === currentQuiz.questions.length-1) {
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (submitBtn) submitBtn.style.display = 'block';
   } else {
-    nextBtn.className = 'icon-btn quiz-nav-btn';
-    nextBtn.innerHTML = '<i class="ti ti-arrow-right"></i>';
-    nextBtn.onclick = nextAction;
-    nextBtn.style.display = 'flex';
-    submitBtn.style.display = 'none';
+    if (nextBtn) {
+      nextBtn.className = 'icon-btn quiz-nav-btn';
+      nextBtn.innerHTML = '<i class="ti ti-arrow-right"></i>';
+      nextBtn.onclick = nextAction;
+      nextBtn.style.display = 'flex';
+    }
+    if (submitBtn) submitBtn.style.display = 'none';
   }
 }
 
-// ==================== SUBMIT ====================
-submitBtn.addEventListener('click', async () => {
-  if (!currentQuiz) return;
-  clearTimer();
-  const responses = [...userResponses];
-  let totalScore = 0;
-  currentQuiz.questions.forEach((q, i) => {
-    const resp = responses[i];
-    if (resp && resp.answerIndex === q.answer) {
-      totalScore += calculateScore(q, resp.timeElapsed);
-    }
+// Submit
+if (submitBtn) {
+  submitBtn.addEventListener('click', async () => {
+    if (!currentQuiz) return;
+    clearTimer();
+    const responses = [...userResponses];
+    let totalScore = 0;
+    currentQuiz.questions.forEach((q,i) => {
+      const resp = responses[i];
+      if (resp && resp.answerIndex === q.answer) totalScore += calculateScore(q, resp.timeElapsed);
+    });
+    await saveAttempt(currentQuiz.originalId || currentQuiz.id, responses, totalScore, currentQuiz.questions);
+    showReviewScreen(currentQuiz.questions, responses, totalScore);
+    loadLeaderboard();
   });
-  // Simpan attempt beserta soal yang sudah diacak
-  await saveAttempt(currentQuiz.originalId || currentQuiz.id, responses, totalScore, currentQuiz.questions);
-  showReviewScreen(currentQuiz.questions, responses, totalScore, false);
-  loadLeaderboard();
-});
+}
 
-// ==================== REVIEW SCREEN ====================
-function showReviewScreen(questions, responses, score, isFromAttempt = false) {
-  // questions bisa berasal dari attempt (shuffled) atau dari currentQuiz.questions
+function showReviewScreen(questions, responses, score) {
+  if (!resultScore || !reviewContainer) return;
   resultScore.textContent = `${score} poin`;
   let html = '';
-  questions.forEach((q, i) => {
+  questions.forEach((q,i) => {
     const resp = responses[i];
     const ok = resp && resp.answerIndex === q.answer;
     const userAns = resp ? q.options[resp.answerIndex] : 'Tidak dijawab';
@@ -678,8 +644,8 @@ function showReviewScreen(questions, responses, score, isFromAttempt = false) {
     const scoreInfo = resp ? (ok ? `Skor: ${calculateScore(q, resp.timeElapsed)}` : 'Skor: 0') : 'Skor: 0';
     html += `
       <div class="review-item">
-        <p><strong>Soal ${i + 1}:</strong> ${q.question} ${ok ? '<i class="ti ti-check correct"></i>' : '<i class="ti ti-x wrong"></i>'}</p>
-        <p>Jawaban kamu: <span class="${ok ? 'correct' : 'wrong'}">${userAns}</span> <span style="color:var(--subtext1);font-size:0.8rem;">(${timeInfo})</span></p>
+        <p><strong>Soal ${i+1}:</strong> ${q.question} ${ok?'<i class="ti ti-check correct"></i>':'<i class="ti ti-x wrong"></i>'}</p>
+        <p>Jawaban kamu: <span class="${ok?'correct':'wrong'}">${userAns}</span> <span style="color:var(--subtext1);font-size:0.8rem;">(${timeInfo})</span></p>
         ${!ok ? `<p>Jawaban benar: <span class="correct">${q.options[q.answer]}</span></p>` : ''}
         <p style="font-style:italic;">📘 ${q.explanation}</p>
         <p style="font-weight:600;">${scoreInfo}</p>
@@ -690,24 +656,19 @@ function showReviewScreen(questions, responses, score, isFromAttempt = false) {
   showScreen('resultScreen');
 }
 
-backToHomeBtn.addEventListener('click', () => {
-  showScreen('dashboardScreen');
-  loadLeaderboard();
-  window.location.hash = '';
-});
+if (backToHomeBtn) {
+  backToHomeBtn.addEventListener('click', () => {
+    showScreen('dashboardScreen');
+    loadLeaderboard();
+    window.location.hash = '';
+  });
+}
 
-// Inisialisasi auto-detect quizzes
+// Inisialisasi auto-detect
 function initApp() {
   sampleQuizzes = window.IRMA_QUIZZES || [];
-  if (!sampleQuizzes.length) {
-    setTimeout(initApp, 300);
-    return;
-  }
-  if (currentUser) {
-    loadQuizzes();
-    loadLeaderboard();
-    checkHash();
-  }
+  if (!sampleQuizzes.length) { setTimeout(initApp,300); return; }
+  if (currentUser) { loadQuizzes(); loadLeaderboard(); checkHash(); }
 }
 if (window.IRMA_QUIZZES?.length) initApp();
 else window.addEventListener('quizzesLoaded', initApp);
