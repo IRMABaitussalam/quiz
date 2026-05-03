@@ -184,11 +184,20 @@ function saveLocalAttempt(qid,ans,score) {
 function getLocalLeaderboard() { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY)||'[]'); }
 function safeNum(v) { const n=parseInt(v,10); return isNaN(n)?0:n; }
 function addToLocalLeaderboard(score) {
-  const lb=getLocalLeaderboard(); 
-  const ex=lb.find(e=>e.email===currentUser.email);
-  if(ex) ex.totalScore=safeNum(ex.totalScore)+score; 
-  else lb.push({email:currentUser.email,name:currentUser.displayName,totalScore:score});
-  localStorage.setItem(LEADERBOARD_KEY,JSON.stringify(lb));
+  const lb = getLocalLeaderboard();
+  const displayName = currentUser?.displayName?.trim() || 'Tanpa Nama';
+  const ex = lb.find(e => e.email === currentUser.email);
+  if (ex) {
+    ex.totalScore = safeNum(ex.totalScore) + score;
+    ex.name = displayName;  // perbarui nama jika berubah
+  } else {
+    lb.push({
+      email: currentUser.email,
+      name: displayName,
+      totalScore: score
+    });
+  }
+  localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lb));
 }
 
 async function getUserAttempt(qid) {
@@ -218,38 +227,67 @@ async function saveAttempt(qid,ans,score) {
   }
 }
 async function addToLeaderboard(score) {
-  try { 
-    const r=db.collection('leaderboard').doc(currentUser.uid); 
-    const d=await r.get(); 
-    if(d.exists) await r.update({totalScore:firebase.firestore.FieldValue.increment(score)}); 
-    else await r.set({uid:currentUser.uid,name:currentUser.displayName,totalScore:score}); 
+  const displayName = currentUser?.displayName?.trim() || 'Tanpa Nama';
+  try {
+    const ref = db.collection('leaderboard').doc(currentUser.uid);
+    const doc = await ref.get();
+    if (doc.exists) {
+      await ref.update({
+        totalScore: firebase.firestore.FieldValue.increment(score)
+      });
+    } else {
+      await ref.set({
+        uid: currentUser.uid,
+        name: displayName,
+        totalScore: score
+      });
+    }
+  } catch (e) {
+    throw e;
   }
-  catch(e){ throw e; }
 }
 async function loadLeaderboard() {
+  // fungsi pembantu
+  function cleanName(name) {
+    if (typeof name !== 'string') return 'Tanpa Nama';
+    const trimmed = name.trim();
+    return trimmed === '' ? 'Tanpa Nama' : trimmed;
+  }
+
   try {
-    const snap=await db.collection('leaderboard').orderBy('totalScore','desc').limit(20).get(); 
-    leaderboardList.innerHTML='';
-    if(snap.empty){ leaderboardEmpty.style.display='block'; return; } 
-    leaderboardEmpty.style.display='none';
-    snap.forEach((d,i)=>{
-      const data=d.data(); 
-      const name = data.name || 'Tanpa Nama'; 
+    const snap = await db.collection('leaderboard')
+      .orderBy('totalScore', 'desc')
+      .limit(20)
+      .get();
+    leaderboardList.innerHTML = '';
+    if (snap.empty) {
+      leaderboardEmpty.style.display = 'block';
+      return;
+    }
+    leaderboardEmpty.style.display = 'none';
+    snap.forEach((doc, i) => {
+      const data = doc.data();
+      const name = cleanName(data.name);
       const score = safeNum(data.totalScore);
-      const li = document.createElement('li'); 
-      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${score} poin</strong>`;
+      const li = document.createElement('li');
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i + 1}. ${name}</span> <strong>${score} poin</strong>`;
       leaderboardList.appendChild(li);
     });
-  } catch(e){
-    const l=getLocalLeaderboard(); 
-    leaderboardList.innerHTML=''; 
-    if(!l.length){ leaderboardEmpty.style.display='block'; return; } 
-    leaderboardEmpty.style.display='none';
-    l.sort((a,b)=>safeNum(b.totalScore)-safeNum(a.totalScore));
-    l.forEach((u,i)=>{
-      const name = u.name || 'Tanpa Nama';
-      const li = document.createElement('li'); 
-      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i+1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
+  } catch (e) {
+    console.warn('Leaderboard Firestore gagal, gunakan lokal:', e);
+    // fallback localStorage
+    const local = getLocalLeaderboard();
+    leaderboardList.innerHTML = '';
+    if (!local.length) {
+      leaderboardEmpty.style.display = 'block';
+      return;
+    }
+    leaderboardEmpty.style.display = 'none';
+    local.sort((a, b) => safeNum(b.totalScore) - safeNum(a.totalScore));
+    local.forEach((u, i) => {
+      const name = cleanName(u.name);
+      const li = document.createElement('li');
+      li.innerHTML = `<span><i class="ti ti-medal"></i> ${i + 1}. ${name}</span> <strong>${safeNum(u.totalScore)} poin</strong>`;
       leaderboardList.appendChild(li);
     });
   }
