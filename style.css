@@ -216,8 +216,8 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 /* Deskripsi quiz card */
 .quiz-card .description {
   color: var(--subtext1);
-  font-size: 0.75rem;
-  margin-top: 6px;
+  font-size: 0.85rem;
+  margin-top: 4px;
   line-height: 1.3;
 }
 
