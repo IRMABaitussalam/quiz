@@ -12,7 +12,7 @@
 </head>
 <body>
   <div class="app-wrapper">
-    <!-- Header / Navbar -->
+    <!-- Header -->
     <header id="mainNavbar" class="app-header" style="display: none;">
       <div class="header-left">
         <div class="avatar-wrapper" id="profileTrigger">
@@ -20,28 +20,18 @@
         </div>
         <span class="brand-title">IRMA Baitussalam</span>
       </div>
-
-      <!-- Desktop inline -->
       <div class="nav-links">
         <button id="navHomeDesktop" class="nav-btn"><i class="ti ti-home"></i> Beranda</button>
         <a href="https://irmabaitussalam.github.io/kontak" class="nav-btn"><i class="ti ti-mail"></i> Kontak</a>
         <button id="toggleThemeDesktop" class="theme-toggle-btn"><i class="ti ti-moon"></i></button>
       </div>
-
-      <!-- Hamburger mobile -->
       <button id="hamburgerBtn" class="hamburger-btn">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span>
       </button>
-
-      <!-- Dropdown profil -->
       <div id="profileDropdown" class="dropdown-menu profile-dropdown">
         <p style="font-weight:600; margin-bottom:8px;" id="profileName"></p>
         <button id="logoutBtnFromDropdown"><i class="ti ti-logout"></i> Keluar</button>
       </div>
-
-      <!-- Dropdown mobile -->
       <div id="hamburgerDropdown" class="dropdown-menu hamburger-dropdown">
         <button id="navHomeMobile"><i class="ti ti-home"></i> Beranda</button>
         <a href="https://irmabaitussalam.github.io/kontak"><i class="ti ti-mail"></i> Kontak</a>
@@ -49,12 +39,12 @@
       </div>
     </header>
 
-    <!-- Layar Login -->
+    <!-- Login -->
     <div id="loginScreen" class="screen active">
       <div class="neu-card login-card">
-        <i class="ti ti-book" style="font-size: 3rem; color: var(--icon-color);"></i>
+        <i class="ti ti-book" style="font-size:3rem; color:var(--icon-color);"></i>
         <h2>Masuk ke IRMA Quiz</h2>
-        <p style="color: var(--subtext1);">Gunakan akun Google untuk melanjutkan</p>
+        <p style="color:var(--subtext1);">Gunakan akun Google</p>
         <div class="login-btn-wrapper">
           <button id="googleLoginBtn" class="nav-btn"><i class="ti ti-brand-google"></i> Masuk dengan Google</button>
         </div>
@@ -66,7 +56,7 @@
     <div id="dashboardScreen" class="screen">
       <div class="search-wrapper">
         <i class="ti ti-search"></i>
-        <input type="text" id="searchInput" placeholder="Cari kuis atau materi...">
+        <input type="text" id="searchInput" placeholder="Cari kuis...">
       </div>
       <div class="section-title"><i class="ti ti-clipboard-list"></i> Kuis Terbaru</div>
       <div id="quizContainer" class="quiz-grid"></div>
@@ -77,24 +67,13 @@
       </div>
     </div>
 
-    <!-- Kontak -->
-    <div id="contactScreen" class="screen">
-      <div class="neu-card" style="max-width: 600px; margin: 0 auto;">
-        <h2 style="margin-bottom: 16px;"><i class="ti ti-mail"></i> Kontak Kami</h2>
-        <p style="margin-bottom:12px;"><i class="ti ti-map-pin"></i> Jl. Baitussalam No. 22, Garut</p>
-        <p style="margin-bottom:12px;"><i class="ti ti-phone"></i> +62 812-3456-7890</p>
-        <p style="margin-bottom:12px;"><i class="ti ti-mail"></i> irma.baitussalam@example.com</p>
-        <p><i class="ti ti-brand-instagram"></i> @irmabaitussalam</p>
-      </div>
-    </div>
-
-    <!-- Layar Kuis -->
+    <!-- Kuis -->
     <div id="quizScreen" class="screen">
       <div class="neu-card" id="quizCard">
         <h2 id="quizTitle"></h2>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <p id="questionNumber" style="font-weight:600;"></p>
-        <p id="questionText" style="margin: 12px 0;"></p>
+        <p id="questionText" style="margin:12px 0;"></p>
         <div id="optionsContainer"></div>
         <div class="quiz-navigation">
           <button id="prevQuestionBtn" class="icon-btn quiz-nav-btn"><i class="ti ti-arrow-left"></i> Sebelumnya</button>
@@ -104,29 +83,23 @@
       </div>
     </div>
 
-    <!-- Layar Hasil -->
+    <!-- Hasil -->
     <div id="resultScreen" class="screen">
-      <div class="neu-card" style="max-width: 700px; margin: 0 auto;">
-        <div id="resultSummary" style="text-align: center;">
-          <i class="ti ti-rosette" style="font-size:3rem; color: var(--icon-color);"></i>
+      <div class="neu-card" style="max-width:700px; margin:0 auto;">
+        <div id="resultSummary" style="text-align:center;">
+          <i class="ti ti-rosette" style="font-size:3rem; color:var(--icon-color);"></i>
           <h2>Kuis Selesai!</h2>
           <p style="font-size:1.2rem;">Skor kamu: <strong id="resultScore"></strong></p>
         </div>
-        <div id="reviewContainer" style="margin-top: 20px;"></div>
+        <div id="reviewContainer" style="margin-top:20px;"></div>
         <button id="backToHomeBtn" class="icon-btn back-home-btn"><i class="ti ti-home"></i> Kembali ke Beranda</button>
       </div>
     </div>
 
-    <footer class="app-footer">
-      2014–<span id="currentYear"></span> IRMA Baitussalam
-    </footer>
+    <footer class="app-footer">2014–<span id="currentYear"></span> IRMA Baitussalam</footer>
   </div>
 
-  <!-- Data Quiz -->
-  <script src="data/quiz-1.js"></script>
-  <script src="data/quiz-2.js"></script>
-  <script src="data/quiz-3.js"></script>
-  <!-- Logika -->
+  <script src="data/quiz-loader.js"></script>
   <script src="theme.js"></script>
   <script src="script.js"></script>
 </body>
