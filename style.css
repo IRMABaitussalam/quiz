@@ -70,7 +70,15 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   box-shadow:4px 4px 8px var(--shadow-color),-4px -4px 8px var(--highlight-color); cursor:pointer; transition:all 0.2s;
 }
 .hamburger-btn:hover { box-shadow:6px 6px 12px var(--shadow-color),-6px -6px 12px var(--highlight-color); }
-.hamburger-line { width:20px; height:2px; background:var(--icon-color); border-radius:2px; transition:0.3s; }
+.hamburger-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--icon-color);
+  border-radius: 0;          /* <- ubah ke 0 agar ujung tidak bulat */
+  transition: transform 0.3s, opacity 0.2s;
+  transform-origin: center;  /* opsional, memastikan rotasi dari tengah */
+}
 .hamburger-btn.open .hamburger-line:nth-child(1) { transform:translateY(7px) rotate(45deg); }
 .hamburger-btn.open .hamburger-line:nth-child(2) { opacity:0; }
 .hamburger-btn.open .hamburger-line:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
