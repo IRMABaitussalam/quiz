@@ -12,11 +12,38 @@
 </head>
 <body>
   <div class="app-wrapper">
-<!-- Loading screen -->
-<div id="loadingScreen" class="loading-overlay">
-  <div class="loading-spinner"></div>
-  <p style="margin-top: 16px; color: var(--text); font-weight: 500;">Memuat halaman...</p>
-</div>
+
+    <!-- Loading screen -->
+    <div id="loadingScreen" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p style="margin-top:16px; color:var(--text); font-weight:500;">Memuat halaman…</p>
+    </div>
+
+    <!-- Modal Konfirmasi -->
+    <div id="confirmModal" class="modal-overlay" style="display:none;">
+      <div class="modal-card neu-card">
+        <h2>Mulai Kuis?</h2>
+        <p style="margin-bottom:12px;">Kuis ini akan berisi <strong id="confirmQuizName"></strong> (<span id="confirmQuestionCount"></span> soal).</p>
+        <p style="font-size:0.9rem; margin-bottom:12px;">
+          Skor maksimum <strong id="confirmMaxScore"></strong>, minimum <strong id="confirmMinScore"></strong>.
+          Setiap <span id="confirmStep"></span> detik skor berkurang hingga batas minimum.
+        </p>
+        <p><a href="ketentuan.html" target="_blank" style="color:var(--blue);">Baca ketentuan lengkap</a></p>
+        <div style="margin-top:16px; display:flex; gap:10px;">
+          <button id="startQuizConfirmBtn" class="nav-btn">Mulai Kuis</button>
+          <button id="cancelQuizConfirmBtn" class="nav-btn">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Countdown -->
+    <div id="countdownModal" class="modal-overlay" style="display:none;">
+      <div class="modal-card neu-card" style="text-align:center;">
+        <h2>Bersiap...</h2>
+        <p id="countdownTimerText" style="font-size:3rem; font-weight:700;">5</p>
+      </div>
+    </div>
+
     <!-- Header -->
     <header id="mainNavbar" class="app-header" style="display: none;">
       <div class="header-left">
@@ -75,10 +102,10 @@
     <!-- Quiz -->
     <div id="quizScreen" class="screen">
       <div class="neu-card" id="quizCard">
-        <h2 id="quizTitle"></h2>
         <div class="quiz-timer" id="quizTimer">
-          <i class="ti ti-clock"></i> <span id="timerText">00:30</span>
+          <i class="ti ti-clock"></i> <span id="timerText">00:00</span>
         </div>
+        <h2 id="quizTitle"></h2>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <p id="questionNumber" style="font-weight:600;"></p>
         <p id="questionText" style="margin:12px 0;"></p>
@@ -104,14 +131,14 @@
       </div>
     </div>
 
-    <!-- Statistik Modal -->
-<div id="statModal" class="modal-overlay" style="display: none;">
-  <div class="modal-card neu-card stat-card">
-    <h3 style="margin-bottom:12px;">Statistik Peserta</h3>
-    <div id="statContent"></div>
-    <button id="closeStatModal" class="nav-btn" style="margin-top:12px;">Tutup</button>
-  </div>
-</div>
+    <!-- Modal Statistik -->
+    <div id="statModal" class="modal-overlay" style="display: none;">
+      <div class="modal-card neu-card stat-card">
+        <h3 style="margin-bottom:12px;">Statistik Peserta</h3>
+        <div id="statContent"></div>
+        <button id="closeStatModal" class="nav-btn" style="margin-top:12px;">Tutup</button>
+      </div>
+    </div>
 
     <footer class="app-footer">2014–<span id="currentYear"></span> IRMA Baitussalam</footer>
   </div>
