@@ -287,7 +287,7 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
 .back-home-btn {
   width: auto;
   height: auto;
-  margin: 12px auto 0;   /* atas 24px, kiri/kanan auto */
+  margin: 10px auto 0;   /* atas 24px, kiri/kanan auto */
   padding: 12px 24px;
   border-radius: 30px;
   color: var(--text);
@@ -330,8 +330,8 @@ body { background:var(--base); font-family:'Segoe UI',system-ui,sans-serif; colo
   overflow-y: auto;          /* scroll internal jika konten panjang */
   padding: 12px;             /* ruang ekstra untuk shadow */
   margin: -12px;             /* kompensasi padding agar shadow tidak terpotong */
-  margin-bottom: 12px;
-  padding-bottom: -2px;
+  margin-bottom: 10px;
+  padding-bottom: -6px;
 }
 
 #quizScreen .neu-card {
